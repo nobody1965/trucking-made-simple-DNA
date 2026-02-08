@@ -2,49 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Trucking Made Simple – Scenario</title>
+  <title>Trucking Made Simple – Scenario (DOT/HOS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
-      padding: 20px;
-    }
+    body { font-family: Arial, sans-serif; background:#f6f6f6; padding:20px; }
     .card {
-      max-width: 600px;
+      max-width: 760px;
       margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background:#fff;
+      padding:20px;
+      border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
     }
-    h1 {
-      margin-top: 0;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 12px;
-    }
+    h1 { margin: 0 0 6px 0; }
+    h3 { margin: 0 0 16px 0; font-weight: normal; color:#333; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    label { font-weight: bold; display:block; margin-top: 2px; }
     input {
       width: 100%;
-      padding: 8px;
-      margin-top: 4px;
+      padding: 10px;
+      margin-top: 6px;
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
     }
-    input[readonly] {
-      background: #eee;
-    }
+    input[readonly] { background:#eee; }
+    .note { font-size: 12px; color:#666; margin-top:6px; line-height: 1.3; }
+    .row { margin-top: 12px; }
     button {
-      margin-top: 20px;
+      margin-top: 18px;
       padding: 12px;
       width: 100%;
       font-size: 16px;
       cursor: pointer;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      background: #f2f2f2;
     }
-    .note {
+    .badge {
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background:#f0f0f0;
       font-size: 12px;
-      color: #666;
+      margin-top: 10px;
+    }
+    .divider {
+      height: 1px;
+      background: #e6e6e6;
+      margin: 18px 0;
     }
   </style>
 </head>
@@ -52,74 +60,218 @@
 <body>
   <div class="card">
     <h1>Trucking Made Simple</h1>
-    <h3>Scenario Calculator (Fuel + Driving Hours)</h3>
+    <h3>Scenario Calculator (Fuel + DOT/HOS + Hours Away)</h3>
 
-    <!-- INPUTS -->
-    <label>Total Miles (input)</label>
-    <input id="totalMiles" type="number" value="700" />
+    <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Max driving/day = 11 hr • Reset = 10 hr</span>
 
-    <label>Lifetime Avg MPG (read-only)</label>
-    <input id="lifetimeMpg" type="number" value="7" readonly />
+    <div class="divider"></div>
 
-    <label>Avg MPG (Scenario) (optional)</label>
-    <input id="scenarioMpg" type="number" placeholder="Leave blank to use Lifetime MPG" />
+    <div class="grid">
+      <!-- INPUTS -->
+      <div>
+        <label>Total Miles (input)</label>
+        <input id="totalMiles" type="number" value="700" />
+        <div class="note">Deadhead + Loaded + Return</div>
+      </div>
 
-    <label>MPG Used (Scenario) (read-only)</label>
-    <input id="mpgUsed" type="number" readonly />
+      <div>
+        <label>Lifetime Avg MPG (read-only)</label>
+        <input id="lifetimeMpg" type="number" value="7" readonly />
+        <div class="note">From Actual fuel history</div>
+      </div>
 
-    <label>Tank Capacity (gallons)</label>
-    <input id="tankCapacity" type="number" value="120" />
+      <div>
+        <label>Avg MPG (Scenario) (optional input)</label>
+        <input id="scenarioMpg" type="number" placeholder="Leave blank to use Lifetime MPG" />
+        <div class="note">If entered, overrides MPG used for Scenario only</div>
+      </div>
 
-    <label>Fuel Stop Minutes</label>
-    <input id="fuelStopMinutes" type="number" value="15" />
+      <div>
+        <label>MPG Used (Scenario) (read-only)</label>
+        <input id="mpgUsed" type="number" readonly />
+        <div class="note">Scenario MPG OR Lifetime MPG</div>
+      </div>
 
-    <!-- OUTPUTS -->
-    <label>Estimated Gallons Needed (read-only)</label>
-    <input id="gallonsNeeded" type="number" readonly />
+      <div>
+        <label>Tank Capacity (gallons) (input)</label>
+        <input id="tankCapacity" type="number" value="120" />
+      </div>
 
-    <label>Fuel Stops (read-only)</label>
-    <input id="fuelStops" type="number" readonly />
+      <div>
+        <label>Fuel Stop Minutes (input)</label>
+        <input id="fuelStopMinutes" type="number" value="15" />
+        <div class="note">Minimum 15 minutes per stop (MVP default)</div>
+      </div>
 
-    <label>Fuel Stop Time (hours) (read-only)</label>
-    <input id="fuelStopHours" type="number" readonly />
+      <div>
+        <label>Wait / Unload Time (hours) (input)</label>
+        <input id="waitHours" type="number" value="0" step="0.25" />
+        <div class="note">Counts as On-Duty time</div>
+      </div>
 
-    <label>Driving Hours (read-only)</label>
-    <input id="drivingHours" type="number" readonly />
-    <div class="note">Miles ÷ 55 mph</div>
+      <div>
+        <label>Status (read-only)</label>
+        <input id="status" type="text" readonly />
+        <div class="note">Tells you what’s missing</div>
+      </div>
+
+      <!-- OUTPUTS -->
+      <div>
+        <label>Estimated Gallons Needed (read-only)</label>
+        <input id="gallonsNeeded" type="number" readonly />
+      </div>
+
+      <div>
+        <label>Fuel Stops (read-only)</label>
+        <input id="fuelStops" type="number" readonly />
+        <div class="note">ceil(gallons ÷ tank) − 1 (min 0)</div>
+      </div>
+
+      <div>
+        <label>Fuel Stop Time (hours) (read-only)</label>
+        <input id="fuelStopHours" type="number" readonly />
+        <div class="note">fuelStops × minutes ÷ 60</div>
+      </div>
+
+      <div>
+        <label>Driving Hours (read-only)</label>
+        <input id="drivingHours" type="number" readonly />
+        <div class="note">Total Miles ÷ 65 mph</div>
+      </div>
+
+      <div>
+        <label>DOT Break (hours) (read-only)</label>
+        <input id="dotBreakHours" type="number" readonly />
+        <div class="note">0.5 hr if Driving Hours &gt; 8</div>
+      </div>
+
+      <div>
+        <label>Duty Days (read-only)</label>
+        <input id="dutyDays" type="number" readonly />
+        <div class="note">ceil(Driving Hours ÷ 11)</div>
+      </div>
+
+      <div>
+        <label>Reset Time (hours) (read-only)</label>
+        <input id="resetHours" type="number" readonly />
+        <div class="note">(Duty Days − 1) × 10</div>
+      </div>
+
+      <div>
+        <label>Total Hours Away (Scenario) (read-only)</label>
+        <input id="totalHoursAway" type="number" readonly />
+        <div class="note">Driving + DOT Break + Fuel Stop Time + Wait + Reset</div>
+      </div>
+    </div>
 
     <button onclick="runScenario()">Run Scenario</button>
   </div>
 
   <script>
+    const AVG_SPEED_MPH = 65;     // Locked
+    const DOT_BREAK_HOURS = 0.5;  // Locked: 30 min
+    const MAX_DRIVE_PER_DAY = 11; // Locked
+    const RESET_HOURS = 10;       // Locked
+
+    function ceil(n) { return Math.ceil(n); }
+    function num(id) { return Number(document.getElementById(id).value); }
+    function str(id) { return document.getElementById(id).value; }
+    function set(id, v) { document.getElementById(id).value = v; }
+
     function runScenario() {
-      const totalMiles = Number(document.getElementById("totalMiles").value);
-      const lifetimeMpg = Number(document.getElementById("lifetimeMpg").value);
-      const scenarioMpgInput = document.getElementById("scenarioMpg").value;
-      const tankCapacity = Number(document.getElementById("tankCapacity").value);
-      const fuelStopMinutes = Number(document.getElementById("fuelStopMinutes").value);
+      const totalMiles = num("totalMiles");
+      const lifetimeMpg = num("lifetimeMpg");
+      const scenarioMpgRaw = str("scenarioMpg");
+      const tankCapacity = num("tankCapacity");
+      const fuelStopMinutes = num("fuelStopMinutes");
+      const waitHours = num("waitHours");
 
-      const mpgUsed = scenarioMpgInput
-        ? Number(scenarioMpgInput)
-        : lifetimeMpg;
+      // Basic validation
+      if (!isFinite(totalMiles) || totalMiles <= 0) {
+        set("status", "Enter Total Miles > 0");
+        clearOutputs();
+        return;
+      }
+      if (!isFinite(lifetimeMpg) || lifetimeMpg <= 0) {
+        set("status", "Lifetime MPG must be > 0");
+        clearOutputs();
+        return;
+      }
+      if (!isFinite(tankCapacity) || tankCapacity <= 0) {
+        set("status", "Tank Capacity must be > 0");
+        clearOutputs();
+        return;
+      }
+      if (!isFinite(fuelStopMinutes) || fuelStopMinutes <= 0) {
+        set("status", "Fuel Stop Minutes must be > 0");
+        clearOutputs();
+        return;
+      }
+      if (!isFinite(waitHours) || waitHours < 0) {
+        set("status", "Wait/Unload must be 0 or more");
+        clearOutputs();
+        return;
+      }
 
-      // MPG used (locked)
-      document.getElementById("mpgUsed").value = mpgUsed.toFixed(2);
+      // MPG used: scenario override if provided (and valid)
+      let mpgUsed = lifetimeMpg;
+      if (scenarioMpgRaw !== "") {
+        const scenarioMpg = Number(scenarioMpgRaw);
+        if (!isFinite(scenarioMpg) || scenarioMpg <= 0) {
+          set("status", "Avg MPG (Scenario) must be blank or > 0");
+          clearOutputs();
+          return;
+        }
+        mpgUsed = scenarioMpg;
+      }
 
-      // Fuel gallons
+      set("mpgUsed", mpgUsed.toFixed(2));
+
+      // Fuel
       const gallonsNeeded = totalMiles / mpgUsed;
-      document.getElementById("gallonsNeeded").value = gallonsNeeded.toFixed(2);
+      set("gallonsNeeded", gallonsNeeded.toFixed(2));
 
-      // Fuel stops (never negative)
-      const stops = Math.max(Math.ceil(gallonsNeeded / tankCapacity) - 1, 0);
-      document.getElementById("fuelStops").value = stops;
+      const fuelStops = Math.max(ceil(gallonsNeeded / tankCapacity) - 1, 0);
+      set("fuelStops", String(fuelStops));
 
-      // Fuel stop time (hours)
-      const stopHours = (stops * fuelStopMinutes) / 60;
-      document.getElementById("fuelStopHours").value = stopHours.toFixed(2);
+      const fuelStopHours = (fuelStops * fuelStopMinutes) / 60;
+      set("fuelStopHours", fuelStopHours.toFixed(2));
 
-      // Driving hours @ 55 mph
-      const drivingHours = totalMiles / 55;
-      document.getElementById("drivingHours").value = drivingHours.toFixed(2);
+      // DOT/HOS
+      const drivingHours = totalMiles / AVG_SPEED_MPH;
+      set("drivingHours", drivingHours.toFixed(2));
+
+      const dotBreak = drivingHours > 8 ? DOT_BREAK_HOURS : 0;
+      set("dotBreakHours", dotBreak.toFixed(2));
+
+      const dutyDays = ceil(drivingHours / MAX_DRIVE_PER_DAY);
+      set("dutyDays", String(dutyDays));
+
+      const resetHours = Math.max((dutyDays - 1) * RESET_HOURS, 0);
+      set("resetHours", resetHours.toFixed(2));
+
+      const totalHoursAway =
+        drivingHours +
+        dotBreak +
+        fuelStopHours +
+        waitHours +
+        resetHours;
+
+      set("totalHoursAway", totalHoursAway.toFixed(2));
+
+      set("status", "OK");
+    }
+
+    function clearOutputs() {
+      set("mpgUsed", "");
+      set("gallonsNeeded", "");
+      set("fuelStops", "");
+      set("fuelStopHours", "");
+      set("drivingHours", "");
+      set("dotBreakHours", "");
+      set("dutyDays", "");
+      set("resetHours", "");
+      set("totalHoursAway", "");
     }
 
     // Run once on load
