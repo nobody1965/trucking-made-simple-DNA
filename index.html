@@ -181,7 +181,24 @@
         <div class="note">Driving + DOT Break + Fuel Stop Time + Wait + Reset</div>
       </div>
     </div>
-<div class="row" style="margin-top:12px;">
+<div>
+  <label>Net Revenue (Scenario) (read-only)</label>
+  <input id="netRevenue" type="number" readonly />
+  <div class="note">Revenue - Other Trip Costs (fuel not subtracted in this step)</div>
+</div>
+
+<div>
+  <label>$ / Mile (Scenario) (read-only)</label>
+  <input id="netPerMile" type="number" readonly />
+  <div class="note">Net Revenue ÷ Total Miles</div>
+</div>
+
+<div>
+  <label>O.T.R.A.F.F ($/hr away) (Scenario) (read-only)</label>
+  <input id="otraf" type="number" readonly />
+  <div class="note">Net Revenue ÷ Total Hours Away</div>
+</div>
+    <div class="row" style="margin-top:12px;">
   <div>
     <label>Mode</label>
     <select id="mode" onchange="syncModeUI()">
@@ -298,6 +315,7 @@ function clearOutputs() {
   setFirst(["dutyDays"], "");
   setFirst(["resetHours"], "");
   setFirst(["totalHoursAway"], "");
+  
   setFirst(["loadDaysConsumed"], "");
   // keep scenarioMpg mirror consistent
   setVal("scenarioMpg", "");
@@ -376,9 +394,20 @@ function updateTotalMilesFromParts() {
   setFirst(["dutyDays"], String(time.dutyDays));
   setFirst(["resetHours"], time.resetHours.toFixed(2));
   setFirst(["totalHoursAway"], time.totalHoursAway.toFixed(2));
-  setFirst(["loadDaysConsumed"], time.loadDaysConsumed.toFixed(2));
+  // --- Revenue + $/mile + O.T.R.A.F.F (Scenario) ---
+const revenue = num("revenue");
+const otherCosts = num("otherCosts");
 
-  setVal("status", time.status);
+const netRevenue = revenue - otherCosts;
+setVal("netRevenue", isFinite(netRevenue) ? netRevenue.toFixed(2) : "");
+
+const netPerMile = netRevenue / totalMiles;
+setVal("netPerMile", isFinite(netPerMile) ? netPerMile.toFixed(2) : "");
+
+const otraf = netRevenue / time.totalHoursAway; // $ per hour away
+setVal("otraf", isFinite(otraf) ? otraf.toFixed(2) : "");
+    
+  if (time.status === "OK") setVal("status", "OK");
 }
 
 // Run once at load
