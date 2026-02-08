@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trucking Made Simple — Scenario (MVP)</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card: #121a2a;
+      --muted: #93a4c7;
+      --text: #e9eefc;
+      --line: rgba(255,255,255,.10);
+      --ok: #31d07f;
+      --bad: #ff4d4d;
+      --btn: #2b63ff;
+      --btn2: #1b2a44;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1000px 700px at 20% 0%, #0e1630 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 18px;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1.1fr .9fr; }
+    }
+    .card {
+      background: rgba(18,26,42,.9);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: #dbe6ff;
+      letter-spacing: .2px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (min-width: 650px) {
+      .row.two { grid-template-columns: 1fr 1fr; }
+      .row.three { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0c1220;
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+    input[readonly] {
+      opacity: .95;
+      background: #0b1426;
+      border-style: dashed;
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+      background: var(--btn2);
+    }
+    .primary { background: var(--btn); }
+    .danger { background: #7a1f2a; }
+    .ok { background: #134a2d; }
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(0,0,0,.18);
+    }
+    .pill strong { color: var(--text); }
+    .out {
+      display: grid;
+      gap: 10px;
+    }
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(0,0,0,.12);
+    }
+    .kpi .k { color: var(--muted); font-size: 12px; }
+    .kpi .v { font-size: 18px; font-weight: 800; margin-top: 3px; }
+    .kpi .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+    .status .good { color: var(--ok); font-weight: 800; }
+    .status .bad { color: var(--bad); font-weight: 800; }
+    .tiny { font-size: 11px; color: var(--muted); margin-top: 8px; }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <h1>Trucking Made Simple — Scenario Button (MVP)</h1>
+  <div class="sub">
+    Scenario calculates estimates only. It does <b>not</b> write to history.
+    Actual Fuel Entries update Lifetime MPG (stored in this browser).
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: Inputs -->
+    <div class="card">
+      <h2>1) Settings (Required)</h2>
+
+      <div class="row two">
+        <div>
+          <label>Monthly Household Total ($)</label>
+          <input id="monthlyHousehold" type="number" step="0.01" placeholder="0" />
+        </div>
+        <div>
+          <label>Monthly Business Fixed Total ($)</label>
+          <input id="monthlyBusinessFixed" type="number" step="0.01" placeholder="0" />
+        </div>
+      </div>
+
+      <div class="row three">
+        <div>
+          <label>Default MPG (if no fuel history)</label>
+          <input id="defaultMpg" type="number" step="0.01" placeholder="e.g. 7.5" />
+        </div>
+        <div>
+          <label>Tank Capacity (gallons)</label>
+          <input id="tankCapacity" type="number" step="0.01" placeholder="e.g. 120" />
+        </div>
+        <div>
+          <label>Fuel Stop Minutes (default 15)</label>
+          <input id="fuelStopMinutes" type="number" step="1" placeholder="15" />
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>Fuel Price ($/gal) — Scenario</label>
+          <input id="fuelPrice" type="number" step="0.01" placeholder="e.g. 3.80" />
+        </div>
+        <div>
+          <label>Avg MPG (Scenario Override) — OPTIONAL</label>
+          <input id="avgMpgScenario" type="number" step="0.01" placeholder="leave blank to use lifetime/default" />
+          <div class="hint">
+            If you type a Scenario MPG, it overrides Lifetime MPG for this one scenario run.
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <h2>2) Load Inputs (Scenario)</h2>
+
+      <div class="row three">
+        <div>
+          <label>Deadhead Miles</label>
+          <input id="deadheadMiles" type="number" step="0.1" placeholder="0" />
+        </div>
+        <div>
+          <label>Loaded Miles</label>
+          <input id="loadedMiles" type="number" step="0.1" placeholder="0" />
+        </div>
+        <div>
+          <label>Return-to-Yard Miles (0 allowed)</label>
+          <input id="returnMiles" type="number" step="0.1" placeholder="0" />
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>Gross Revenue ($)</label>
+          <input id="grossRevenue" type="number" step="0.01" placeholder="0" />
+        </div>
+        <div>
+          <label>Wait / Unload Time (hours)</label>
+          <input id="waitHours" type="number" step="0.1" placeholder="0" />
+        </div>
+      </div>
+
+      <hr />
+
+      <h2>3) MPG Boxes (Read-Only Truth)</h2>
+
+      <div class="row two">
+        <div>
+          <label>Lifetime Avg MPG (Read-Only)</label>
+          <input id="lifetimeAvgMpg" type="text" readonly />
+          <div class="hint">
+            Calculated from Actual Fuel History: Total Actual Miles ÷ Total Actual Gallons
+          </div>
+        </div>
+        <div>
+          <label>MPG Used (Scenario) — Read-Only</label>
+          <input id="mpgUsedScenario" type="text" readonly />
+          <div class="hint">
+            Uses Scenario Override if provided, else Lifetime MPG, else Default MPG.
+          </div>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="btnRunScenario">▶ Run Scenario</button>
+        <button id="btnClearScenario">↺ Clear Scenario Inputs</button>
+        <button class="danger" id="btnResetAll">🧨 Reset ALL Local Data</button>
+      </div>
+
+      <div class="tiny">
+        Locked constants used in this MVP: Avg Speed = 65 mph, DOT Break = 30 min after 8 driving hours,
+        Max Driving/day = 11, Reset = 10 hours off-duty, Daily cost basis = 30.4 days.
+      </div>
+
+      <div class="status" id="statusBox">Status: Ready.</div>
+    </div>
+
+    <!-- RIGHT: Outputs + Actual fuel history input -->
+    <div class="card">
+      <h2>Scenario Outputs</h2>
+
+      <div class="out">
+        <div class="kpi">
+          <div class="k">Total Miles</div>
+          <div class="v" id="outTotalMiles">—</div>
+          <div class="s">deadhead + loaded + return</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Estimated Gallons Needed</div>
+          <div class="v" id="outGallons">—</div>
+          <div class="s">totalMiles ÷ mpgUsed</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Fuel Stops</div>
+          <div class="v" id="outFuelStops">—</div>
+          <div class="s">ceil(gallons ÷ tank) − 1 (min 0)</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Total Hours Away (DOT aware)</div>
+          <div class="v" id="outHoursAway">—</div>
+          <div class="s">driving + break + fuelStopTime + wait + reset</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Fuel Cost (Scenario)</div>
+          <div class="v" id="outFuelCost">—</div>
+          <div class="s">gallons × fuelPrice</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Fixed Cost Allocation</div>
+          <div class="v" id="outFixedAlloc">—</div>
+          <div class="s">DailyFixed × (hoursAway ÷ 24)</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Net Load Revenue (Scenario)</div>
+          <div class="v" id="outNetRevenue">—</div>
+          <div class="s">gross − fixedAlloc − fuelCost (reserves placeholder)</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">O.T.R.A.F.F ($/hr away)</div>
+          <div class="v" id="outOtraffic">—</div>
+          <div class="s">netRevenue ÷ hoursAway</div>
+        </div>
+      </div>
+
+      <hr />
+
+      <h2>Actual Fuel History (Optional)</h2>
+      <div class="hint">
+        This is ONLY to build Lifetime MPG. Scenario never writes history.
+      </div>
+
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label>Actual Miles (Delivered Load)</label>
+          <input id="actualMiles" type="number" step="0.1" placeholder="e.g. 1200" />
+        </div>
+        <div>
+          <label>Actual Gallons</label>
+          <input id="actualGallons" type="number" step="0.01" placeholder="e.g. 170.5" />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="ok" id="btnAddFuelActual">➕ Add Actual Fuel Entry</button>
+        <span class="pill">History MPG: <strong id="historyMpgPill">—</strong></span>
+      </div>
+
+      <div class="hint" id="historyHint" style="margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * Trucking Made Simple — Scenario MVP
+ * - GitHub Pages compatible
+ * - localStorage persistence
+ * - Scenario does NOT write history
+ * - Actual fuel entries DO write history (to build lifetime MPG)
+ */
+
+const LS = {
+  SETTINGS: "tms.settings.v1",
+  FUEL_HISTORY: "tms.fuelHistory.v1"
+};
+
+const $ = (id) => document.getElementById(id);
+
+function toNum(v) {
+  if (v === null || v === undefined) return NaN;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
+function fmt(n, digits = 2) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits });
+}
+function fmt0(n) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString(undefined, { maximumFractionDigits: 0, minimumFractionDigits: 0 });
+}
+function setStatus(msg, good = true) {
+  const box = $("statusBox");
+  const tag = good ? "good" : "bad";
+  box.innerHTML = `Status: <span class="${tag}">${good ? "OK" : "STOP"}</span>\n${msg}`;
+}
+
+function loadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+function saveJson(key, val) {
+  localStorage.setItem(key, JSON.stringify(val));
+}
+
+function readSettings() {
+  const s = {
+    monthlyHousehold: toNum($("monthlyHousehold").value),
+    monthlyBusinessFixed: toNum($("monthlyBusinessFixed").value),
+    defaultMpg: toNum($("defaultMpg").value),
+    tankCapacity: toNum($("tankCapacity").value),
+    fuelStopMinutes: toNum($("fuelStopMinutes").value),
+    fuelPrice: toNum($("fuelPrice").value)
+  };
+  return s;
+}
+
+function settingsComplete(s) {
+  // Spec: nothing calculates until Settings are complete (value, 0, or N/A)
+  // In this MVP: require numbers for essentials (default mpg, tank, fuel stop min, fuel price, monthly costs)
+  const required = ["monthlyHousehold","monthlyBusinessFixed","defaultMpg","tankCapacity","fuelStopMinutes","fuelPrice"];
+  for (const k of required) {
+    if (!Number.isFinite(s[k])) return { ok: false, missing: k };
+    if (s[k] < 0) return { ok: false, missing: k };
+  }
+  if (s.defaultMpg <= 0) return { ok: false, missing: "defaultMpg must be > 0" };
+  if (s.tankCapacity <= 0) return { ok: false, missing: "tankCapacity must be > 0" };
+  if (s.fuelStopMinutes < 0) return { ok: false, missing: "fuelStopMinutes must be >= 0" };
+  if (s.fuelPrice < 0) return { ok: false, missing: "fuelPrice must be >= 0" };
+  return { ok: true };
+}
+
+function readScenarioInputs() {
+  return {
+    deadhead: toNum($("deadheadMiles").value),
+    loaded: toNum($("loadedMiles").value),
+    ret: toNum($("returnMiles").value),
+    gross: toNum($("grossRevenue").value),
+    wait: toNum($("waitHours").value),
+    avgMpgScenario: toNum($("avgMpgScenario").value) // optional (can be NaN)
+  };
+}
+
+function scenarioInputsValid(x) {
+  const required = ["deadhead","loaded","ret","gross","wait"];
+  for (const k of required) {
+    if (!Number.isFinite(x[k])) return { ok:false, missing:k };
+    if (x[k] < 0) return { ok:false, missing:k };
+  }
+  if (x.avgMpgScenario !== x.avgMpgScenario) {
+    // NaN allowed (means no override)
+    return { ok:true };
+  }
+  if (x.avgMpgScenario <= 0) return { ok:false, missing:"avgMpgScenario must be > 0 if provided" };
+  return { ok:true };
+}
+
+function getFuelHistoryTotals() {
+  const list = loadJson(LS.FUEL_HISTORY, []);
+  let totalMiles = 0;
+  let totalGallons = 0;
+  for (const entry of list) {
+    const m = toNum(entry.miles);
+    const g = toNum(entry.gallons);
+    if (Number.isFinite(m) && Number.isFinite(g) && m >= 0 && g > 0) {
+      totalMiles += m;
+      totalGallons += g;
+    }
+  }
+  return { list, totalMiles, totalGallons };
+}
+
+function lifetimeAvgMpgOrNull() {
+  const { totalMiles, totalGallons } = getFuelHistoryTotals();
+  if (totalGallons > 0 && totalMiles > 0) return totalMiles / totalGallons;
+  return null;
+}
+
+/** Fuel model (Scenario) per spec */
+function calcFuelScenario({ totalMiles, mpgUsed, tankCapacity, fuelStopMinutes, fuelPrice }) {
+  const gallons = totalMiles / mpgUsed;
+  const rawStops = Math.ceil(gallons / tankCapacity) - 1;
+  const fuelStops = Math.max(0, rawStops);
+  const fuelStopTimeHours = (fuelStops * fuelStopMinutes) / 60;
+  const fuelCost = gallons * fuelPrice;
+  return { gallons, fuelStops, fuelStopTimeHours, fuelCost };
+}
+
+/** DOT / HOS (Scenario) per your locked spec MVP */
+function calcDotHos({ totalMiles, waitUnloadHours, fuelStopTimeHours }) {
+  const AVG_SPEED = 65;
+
+  const drivingHours = totalMiles / AVG_SPEED;
+
+  // Spec: DOT Break = 0.5 hr if Driving Hours > 8
+  const dotBreak = drivingHours > 8 ? 0.5 : 0;
+
+  // Spec: Duty Days = ceil(Driving Hours ÷ 11)
+  const dutyDays = Math.max(1, Math.ceil(drivingHours / 11));
+
+  // Spec: Reset Time = (Duty Days − 1) × 10
+  const resetTime = (dutyDays - 1) * 10;
+
+  const totalHoursAway =
+    drivingHours +
+    dotBreak +
+    fuelStopTimeHours +
+    waitUnloadHours +
+    resetTime;
+
+  return { drivingHours, dotBreak, dutyDays, resetTime, totalHoursAway };
+}
+
+function dailyFixedCost(monthlyHousehold, monthlyBusinessFixed) {
+  // Spec: Daily Fixed Cost = (Monthly Household + Monthly Business Fixed) ÷ 30.4
+  return (monthlyHousehold + monthlyBusinessFixed) / 30.4;
+}
+
+function fixedCostAllocation(dailyFixed, totalHoursAway) {
+  const loadDays = totalHoursAway / 24;
+  return dailyFixed * loadDays;
+}
+
+function refreshMpgBoxes() {
+  const lifetime = lifetimeAvgMpgOrNull();
+  const settings = readSettings();
+  const s = loadJson(LS.SETTINGS, null);
+
+  // lifetime display
+  $("lifetimeAvgMpg").value = lifetime ? fmt(lifetime, 2) : "No history (uses Default MPG)";
+  $("historyMpgPill").textContent = lifetime ? fmt(lifetime, 2) : "—";
+
+  // also load saved settings into inputs if empty
+  if (s) {
+    for (const k of Object.keys(s)) {
+      if ($(k) && ($(`${k}`).value === "" || $(`${k}`).value === null)) {
+        $(`${k}`).value = s[k];
+      }
+    }
+  }
+
+  // mpg used (scenario) is computed only on run; keep blank here
+  if (!$("mpgUsedScenario").value) $("mpgUsedScenario").value = "—";
+}
+
+function persistSettings() {
+  const s = readSettings();
+  saveJson(LS.SETTINGS, {
+    monthlyHousehold: $("monthlyHousehold").value,
+    monthlyBusinessFixed: $("monthlyBusinessFixed").value,
+    defaultMpg: $("defaultMpg").value,
+    tankCapacity: $("tankCapacity").value,
+    fuelStopMinutes: $("fuelStopMinutes").value,
+    fuelPrice: $("fuelPrice").value
+  });
+}
+
+function runScenario() {
+  persistSettings();
+
+  const s = readSettings();
+  const sc = readScenarioInputs();
+
+  const sOk = settingsComplete(s);
+  if (!sOk.ok) {
+    setStatus(`Settings incomplete: ${sOk.missing}`, false);
+    return;
+  }
+
+  const inOk = scenarioInputsValid(sc);
+  if (!inOk.ok) {
+    setStatus(`Scenario input invalid: ${inOk.missing}`, false);
+    return;
+  }
+
+  const totalMiles = sc.deadhead + sc.loaded + sc.ret;
+
+  // Determine MPG used (Scenario)
+  const lifetime = lifetimeAvgMpgOrNull();
+  let mpgUsed;
+
+  // If user typed avgMpgScenario, use it
+  if (Number.isFinite(sc.avgMpgScenario) && sc.avgMpgScenario > 0) {
+    mpgUsed = sc.avgMpgScenario;
+  } else if (lifetime && lifetime > 0) {
+    mpgUsed = lifetime;
+  } else {
+    mpgUsed = s.defaultMpg;
+  }
+
+  // Update read-only MPG used box
+  $("mpgUsedScenario").value = fmt(mpgUsed, 2);
+
+  // Fuel
+  const fuel = calcFuelScenario({
+    totalMiles,
+    mpgUsed,
+    tankCapacity: s.tankCapacity,
+    fuelStopMinutes: s.fuelStopMinutes,
+    fuelPrice: s.fuelPrice
+  });
+
+  // DOT/HOS
+  const hos = calcDotHos({
+    totalMiles,
+    waitUnloadHours: sc.wait,
+    fuelStopTimeHours: fuel.fuelStopTimeHours
+  });
+
+  // Fixed costs allocation
+  const dailyFixed = dailyFixedCost(s.monthlyHousehold, s.monthlyBusinessFixed);
+  const fixedAlloc = fixedCostAllocation(dailyFixed, hos.totalHoursAway);
+
+  // Reserves placeholder (your spec has reserves; we add them next module)
+  const reservesTotal = 0;
+
+  // Net Revenue (Scenario)
+  const netRevenue = sc.gross - fixedAlloc - fuel.fuelCost - reservesTotal;
+
+  // O.T.R.A.F.F (Scenario)
+  const otr = netRevenue / hos.totalHoursAway;
+
+  // Outputs
+  $("outTotalMiles").textContent = fmt0(totalMiles);
+  $("outGallons").textContent = fmt(fuel.gallons, 2);
+  $("outFuelStops").textContent = fmt0(fuel.fuelStops);
+  $("outHoursAway").textContent = fmt(hos.totalHoursAway, 2);
+  $("outFuelCost").textContent = "$" + fmt(fuel.fuelCost, 2);
+  $("outFixedAlloc").textContent = "$" + fmt(fixedAlloc, 2);
+  $("outNetRevenue").textContent = "$" + fmt(netRevenue, 2);
+  $("outOtraffic").textContent = "$" + fmt(otr, 2);
+
+  // IMPORTANT: Scenario never writes to history.
+  setStatus(
+    `Scenario calculated.\n` +
+    `Total Miles: ${fmt0(totalMiles)}\n` +
+    `MPG Used: ${fmt(mpgUsed,2)} (ScenarioOverride > Lifetime > Default)\n` +
+    `Driving Hours: ${fmt(hos.drivingHours,2)} | DOT Break: ${fmt(hos.dotBreak,2)} | Duty Days: ${hos.dutyDays} | Reset: ${fmt(hos.resetTime,2)}\n` +
+    `Fuel Stops: ${fuel.fuelStops} | Fuel Stop Time: ${fmt(fuel.fuelStopTimeHours,2)}\n` +
+    `Total Hours Away: ${fmt(hos.totalHoursAway,2)}\n` +
+    `Net Revenue: $${fmt(netRevenue,2)} | O.T.R.A.F.F: $${fmt(otr,2)}/hr away`
+  , true);
+}
+
+function clearScenarioInputs() {
+  $("deadheadMiles").value = "";
+  $("loadedMiles").value = "";
+  $("returnMiles").value = "";
+  $("grossRevenue").value = "";
+  $("waitHours").value = "";
+  $("avgMpgScenario").value = "";
+  $("mpgUsedScenario").value = "—";
+
+  // clear outputs
+  $("outTotalMiles").textContent = "—";
+  $("outGallons").textContent = "—";
+  $("outFuelStops").textContent = "—";
+  $("outHoursAway").textContent = "—";
+  $("outFuelCost").textContent = "—";
+  $("outFixedAlloc").textContent = "—";
+  $("outNetRevenue").textContent = "—";
+  $("outOtraffic").textContent = "—";
+
+  setStatus("Scenario inputs cleared.", true);
+}
+
+function addFuelActual() {
+  const miles = toNum($("actualMiles").value);
+  const gallons = toNum($("actualGallons").value);
+
+  if (!Number.isFinite(miles) || miles <= 0) {
+    setStatus("Actual Miles must be > 0", false);
+    return;
+  }
+  if (!Number.isFinite(gallons) || gallons <= 0) {
+    setStatus("Actual Gallons must be > 0", false);
+    return;
+  }
+
+  const history = loadJson(LS.FUEL_HISTORY, []);
+  history.push({ miles, gallons, ts: new Date().toISOString() });
+  saveJson(LS.FUEL_HISTORY, history);
+
+  $("actualMiles").value = "";
+  $("actualGallons").value = "";
+
+  const life = lifetimeAvgMpgOrNull();
+  refreshMpgBoxes();
+
+  setStatus(
+    `Actual fuel entry saved.\n` +
+    `Lifetime Avg MPG is now: ${life ? fmt(life,2) : "—"}\n` +
+    `Note: Scenario does not write history; this fuel entry is Actual history only.`,
+    true
+  );
+}
+
+function resetAll() {
+  localStorage.removeItem(LS.SETTINGS);
+  localStorage.removeItem(LS.FUEL_HISTORY);
+
+  // clear all inputs
+  [
+    "monthlyHousehold","monthlyBusinessFixed","defaultMpg","tankCapacity",
+    "fuelStopMinutes","fuelPrice","avgMpgScenario",
+    "deadheadMiles","loadedMiles","returnMiles","grossRevenue","waitHours",
+    "actualMiles","actualGallons"
+  ].forEach(id => { if ($(id)) $(id).value = ""; });
+
+  clearScenarioInputs();
+  refreshMpgBoxes();
+  setStatus("All local data reset (settings + fuel history).", true);
+}
+
+function wire() {
+  $("btnRunScenario").addEventListener("click", runScenario);
+  $("btnClearScenario").addEventListener("click", clearScenarioInputs);
+  $("btnAddFuelActual").addEventListener("click", addFuelActual);
+  $("btnResetAll").addEventListener("click", resetAll);
+
+  // refresh MPG boxes and preload saved settings
+  refreshMpgBoxes();
+
+  // Update MPG read-only pill as settings change (doesn't calculate scenario)
+  ["monthlyHousehold","monthlyBusinessFixed","defaultMpg","tankCapacity","fuelStopMinutes","fuelPrice"]
+    .forEach(id => $(id).addEventListener("input", () => {
+      persistSettings();
+      refreshMpgBoxes();
+    }));
+
+  // show history summary
+  const { totalMiles, totalGallons } = getFuelHistoryTotals();
+  $("historyHint").textContent =
+    totalGallons > 0
+      ? `Fuel history totals in this browser: ${fmt(totalMiles,0)} miles / ${fmt(totalGallons,2)} gallons`
+      : "No fuel history saved yet. Add Actual Fuel Entries to build Lifetime MPG.";
+}
+
+wire();
+</script>
+</body>
+</html>
