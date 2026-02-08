@@ -69,10 +69,25 @@
     <div class="grid">
       <!-- INPUTS -->
       <div>
-        <label>Total Miles (input)</label>
-        <input id="totalMiles" type="number" value="700" />
-        <div class="note">Deadhead + Loaded + Return</div>
-      </div>
+  <label>Deadhead Miles (input)</label>
+  <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+</div>
+
+<div>
+  <label>Loaded Miles (input)</label>
+  <input id="loadedMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+</div>
+
+<div>
+  <label>Return Miles (input)</label>
+  <input id="returnMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+</div>
+
+<div>
+  <label>Total Miles (auto)</label>
+  <input id="totalMiles" type="number" readonly />
+  <div class="note">Deadhead + Loaded + Return</div>
+</div>
 
       <div>
         <label>Lifetime Avg MPG (read-only)</label>
@@ -277,7 +292,16 @@ function clearOutputs() {
   // keep scenarioMpg mirror consistent
   setVal("scenarioMpg", "");
 }
+function updateTotalMilesFromParts() {
+  const deadhead = Number(document.getElementById("deadheadMiles")?.value || 0);
+  const loaded   = Number(document.getElementById("loadedMiles")?.value || 0);
+  const ret      = Number(document.getElementById("returnMiles")?.value || 0);
 
+  const total = deadhead + loaded + ret;
+
+  const totalEl = document.getElementById("totalMiles");
+  if (totalEl) totalEl.value = total;
+}
 function runScenario() {
   // read inputs
   const totalMiles = num("totalMiles");
