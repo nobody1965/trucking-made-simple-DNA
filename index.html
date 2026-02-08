@@ -163,7 +163,26 @@
         <div class="note">Driving + DOT Break + Fuel Stop Time + Wait + Reset</div>
       </div>
     </div>
+<div class="row" style="margin-top:12px;">
+  <div>
+    <label>Mode</label>
+    <select id="mode" onchange="syncModeUI()">
+      <option value="scenario" selected>Scenario</option>
+      <option value="actual">Actual (locked until Delivered)</option>
+    </select>
+    <div class="note">Scenario is always available. Actual unlocks after Delivered.</div>
+  </div>
 
+  <div>
+    <label>Trip Status</label>
+    <select id="tripStatus" onchange="syncModeUI()">
+      <option value="planning" selected>Planning</option>
+      <option value="accepted">Accepted</option>
+      <option value="delivered">Delivered (unlocks Actual)</option>
+    </select>
+    <div class="note">Actual mode is read-only until Delivered.</div>
+  </div>
+</div>
     <button onclick="runScenario()">Run Scenario</button>
   </div>
 
@@ -176,7 +195,24 @@
   function round2(n) {
     return Math.round((n + Number.EPSILON) * 100) / 100;
   }
+function syncModeUI() {
+  const modeEl = document.getElementById("mode");
+  const tripEl = document.getElementById("tripStatus");
+  const statusEl = document.getElementById("status");
 
+  if (!modeEl || !tripEl) return;
+
+  const mode = modeEl.value;
+  const trip = tripEl.value;
+
+  // Actual mode is locked until Delivered
+  if (mode === "actual" && trip !== "delivered") {
+    modeEl.value = "scenario";
+    if (statusEl) statusEl.value = "Actual locked until Delivered";
+  } else {
+    if (statusEl) statusEl.value = "OK";
+  }
+}
   // ===== PC-SCENARIO-ACTUAL-ENGINE v1.0 (Scenario Time Engine MVP) =====
   // Average Speed fixed: 65 mph
   // Max driving per day: 11 hours
@@ -337,8 +373,9 @@
 
     // Run once on load
     runScenario();
-  </script>
-function runScenario() {
+  
+syncModeUI();
+          function runScenario() {
   // Read inputs
   const totalMiles = num("totalMiles");
   const lifetimeMpg = num("lifetimeMpg");
@@ -387,5 +424,7 @@ function runScenario() {
   set("loadDaysConsumed", time.loadDaysConsumed.toFixed(2));
   set("status", time.status);
 }
+  </script>
   </body>
 </html>
+  
