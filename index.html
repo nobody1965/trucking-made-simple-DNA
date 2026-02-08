@@ -1,3 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trucking Made Simple – Scenario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      padding: 20px;
+    }
+    .card {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    input[readonly] {
+      background: #eee;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .note {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Trucking Made Simple</h1>
+    <h3>Scenario Calculator (Fuel + Driving Hours)</h3>
+
+    <!-- INPUTS -->
+    <label>Total Miles (input)</label>
+    <input id="totalMiles" type="number" value="700" />
+
+    <label>Lifetime Avg MPG (read-only)</label>
+    <input id="lifetimeMpg" type="number" value="7" readonly />
+
+    <label>Avg MPG (Scenario) (optional)</label>
+    <input id="scenarioMpg" type="number" placeholder="Leave blank to use Lifetime MPG" />
+
+    <label>MPG Used (Scenario) (read-only)</label>
+    <input id="mpgUsed" type="number" readonly />
+
+    <label>Tank Capacity (gallons)</label>
+    <input id="tankCapacity" type="number" value="120" />
+
+    <label>Fuel Stop Minutes</label>
+    <input id="fuelStopMinutes" type="number" value="15" />
+
+    <!-- OUTPUTS -->
+    <label>Estimated Gallons Needed (read-only)</label>
+    <input id="gallonsNeeded" type="number" readonly />
+
+    <label>Fuel Stops (read-only)</label>
+    <input id="fuelStops" type="number" readonly />
+
+    <label>Fuel Stop Time (hours) (read-only)</label>
+    <input id="fuelStopHours" type="number" readonly />
+
+    <label>Driving Hours (read-only)</label>
+    <input id="drivingHours" type="number" readonly />
+    <div class="note">Miles ÷ 55 mph</div>
+
+    <button onclick="runScenario()">Run Scenario</button>
+  </div>
+
+  <script>
+    function runScenario() {
+      const totalMiles = Number(document.getElementById("totalMiles").value);
+      const lifetimeMpg = Number(document.getElementById("lifetimeMpg").value);
+      const scenarioMpgInput = document.getElementById("scenarioMpg").value;
+      const tankCapacity = Number(document.getElementById("tankCapacity").value);
+      const fuelStopMinutes = Number(document.getElementById("fuelStopMinutes").value);
+
+      const mpgUsed = scenarioMpgInput
+        ? Number(scenarioMpgInput)
+        : lifetimeMpg;
+
+      // MPG used (locked)
+      document.getElementById("mpgUsed").value = mpgUsed.toFixed(2);
+
+      // Fuel gallons
+      const gallonsNeeded = totalMiles / mpgUsed;
+      document.getElementById("gallonsNeeded").value = gallonsNeeded.toFixed(2);
+
+      // Fuel stops (never negative)
+      const stops = Math.max(Math.ceil(gallonsNeeded / tankCapacity) - 1, 0);
+      document.getElementById("fuelStops").value = stops;
+
+      // Fuel stop time (hours)
+      const stopHours = (stops * fuelStopMinutes) / 60;
+      document.getElementById("fuelStopHours").value = stopHours.toFixed(2);
+
+      // Driving hours @ 55 mph
+      const drivingHours = totalMiles / 55;
+      document.getElementById("drivingHours").value = drivingHours.toFixed(2);
+    }
+
+    // Run once on load
+    runScenario();
+  </script>
+</body>
 </html>
