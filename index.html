@@ -180,236 +180,175 @@
   </div>
 
   
-    <script>
-  function ceil(n) {
-    return Math.ceil(n);
-  }
+    
 
-  function round2(n) {
-    return Math.round((n + Number.EPSILON) * 100) / 100;
-  }
-function syncModeUI() {
-  const modeEl = document.getElementById("mode");
-  const tripEl = document.getElementById("tripStatus");
-  const statusEl = document.getElementById("status");
+<script>
+/* ===============================
+   Trucking Made Simple — Scenario Engine (Option B)
+   RULE: Scenario ALWAYS uses Lifetime MPG
+   =============================== */
 
+const AVG_SPEED_MPH = 65;       // locked
+const DOT_BREAK_HOURS = 0.5;    // locked: 30 minutes
+const MAX_DRIVE_PER_DAY = 11;   // locked
+const RESET_HOURS = 10;         // locked
+
+function ceil(n) { return Math.ceil(n); }
+function round2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+
+function getEl(id) { return document.getElementById(id); }
+function num(id) {
+  const el = getEl(id);
+  if (!el) return NaN;
+  return Number(el.value);
+}
+function setVal(id, v) {
+  const el = getEl(id);
+  if (!el) return;
+  el.value = v;
+}
+function setFirst(ids, v) {
+  for (const id of ids) {
+    const el = getEl(id);
+    if (el) { el.value = v; return; }
+  }
+}
+
+/* Keeps UI rules: Actual locked until Delivered */
+function syncModelUI() {
+  const modeEl = getEl("mode");
+  const tripEl = getEl("tripStatus");
   if (!modeEl || !tripEl) return;
 
   const mode = modeEl.value;
   const trip = tripEl.value;
 
-  // Actual mode is locked until Delivered
+  // lock actual until delivered
   if (mode === "actual" && trip !== "delivered") {
     modeEl.value = "scenario";
-    if (statusEl) statusEl.value = "Actual locked until Delivered";
+    setVal("status", "Actual locked until Delivered");
   } else {
-    if (statusEl) statusEl.value = "OK";
+    // don’t overwrite status if it already shows validation text
+    const s = getEl("status");
+    if (s && !s.value) s.value = "OK";
   }
 }
-  // ===== PC-SCENARIO-ACTUAL-ENGINE v1.0 (Scenario Time Engine MVP) =====
-  // Average Speed fixed: 65 mph
-  // Max driving per day: 11 hours
-  // Mandatory Break: 0.5 hr if Driving Hours > 8
-  // Reset Time: (DutyDays - 1) * 10
-  // Wait/Unload counts on-duty (included in Total Hours Away)
 
-  function calculateScenarioTime({
-    totalMiles,
-    fuelStopTimeHours,
-    waitUnloadHours
-  }) {
-    const avgSpeed = 65;
+/* Time engine */
+function calculateScenarioTime({ totalMiles, fuelStopTimeHours, waitUnloadHours }) {
+  const drivingHours = totalMiles / AVG_SPEED_MPH;
+  const dotBreakHours = drivingHours > 8 ? DOT_BREAK_HOURS : 0;
 
-    if (!totalMiles || totalMiles <= 0) {
-      return {
-        drivingHours: 0,
-        dotBreakHours: 0,
-        dutyDays: 0,
-        resetHours: 0,
-        totalHoursAway: 0,
-        loadDaysConsumed: 0,
-        status: "Enter Total Miles > 0"
-      };
-    }
+  const dutyDays = ceil(drivingHours / MAX_DRIVE_PER_DAY);
+  const resetHours = Math.max((dutyDays - 1) * RESET_HOURS, 0);
 
-    const drivingHours = totalMiles / avgSpeed;
-    const dotBreakHours = drivingHours > 8 ? 0.5 : 0;
-    const dutyDays = ceil(drivingHours / 11);
-    const resetHours = Math.max(0, (dutyDays - 1) * 10);
-
-    const totalHoursAway =
-      drivingHours +
-      dotBreakHours +
-      
+  const totalHoursAway =
+    drivingHours +
+    dotBreakHours +
     (fuelStopTimeHours || 0) +
-     (waitUnloadHours || 0) +
-      resetHours;
- 
-    const loadDaysConsumed = totalHoursAway / 24;
+    (waitUnloadHours || 0) +
+    resetHours;
 
-    return {
-      drivingHours: round2(drivingHours),
-      dotBreakHours: round2(dotBreakHours),
-      dutyDays,
-      resetHours: round2(resetHours),
-      totalHoursAway: round2(totalHoursAway),
-      loadDaysConsumed: round2(loadDaysConsumed),
-      status: "OK"
-    };
-  }
-<script>
-    const AVG_SPEED_MPH = 65;     // Locked
-    const DOT_BREAK_HOURS = 0.5;  // Locked: 30 min
-    const MAX_DRIVE_PER_DAY = 11; // Locked
-    const RESET_HOURS = 10;       // Locked
+  const loadDaysConsumed = totalHoursAway / 24;
 
-    function ceil(n) { return Math.ceil(n); }
-    function num(id) { return Number(document.getElementById(id).value); }
-    function str(id) { return document.getElementById(id).value; }
-    function set(id, v) { document.getElementById(id).value = v; }
+  return {
+    drivingHours: round2(drivingHours),
+    dotBreakHours: round2(dotBreakHours),
+    dutyDays,
+    resetHours: round2(resetHours),
+    totalHoursAway: round2(totalHoursAway),
+    loadDaysConsumed: round2(loadDaysConsumed),
+    status: "OK"
+  };
+}
 
-    function runScenario() {
-      const totalMiles = num("totalMiles");
-      const lifetimeMpg = num("lifetimeMpg");
-      const scenarioMpgRaw = str("scenarioMpg");
-      const tankCapacity = num("tankCapacity");
-      const fuelStopMinutes = num("fuelStopMinutes");
-      const waitHours = num("waitHours");
+function clearOutputs() {
+  setVal("status", "");
+  setFirst(["mpgUsed"], "");
+  setFirst(["estimatedGallons", "gallonsNeeded"], "");
+  setFirst(["fuelStops"], "");
+  setFirst(["fuelStopHours", "fuelStopTimeHours"], "");
+  setFirst(["drivingHours"], "");
+  setFirst(["dotBreakHours", "dotBreakHour"], "");
+  setFirst(["dutyDays"], "");
+  setFirst(["resetHours"], "");
+  setFirst(["totalHoursAway"], "");
+  setFirst(["loadDaysConsumed"], "");
+  // keep scenarioMpg mirror consistent
+  setVal("scenarioMpg", "");
+}
 
-      // Basic validation
-      if (!isFinite(totalMiles) || totalMiles <= 0) {
-        set("status", "Enter Total Miles > 0");
-        clearOutputs();
-        return;
-      }
-      if (!isFinite(lifetimeMpg) || lifetimeMpg <= 0) {
-        set("status", "Lifetime MPG must be > 0");
-        clearOutputs();
-        return;
-      }
-      if (!isFinite(tankCapacity) || tankCapacity <= 0) {
-        set("status", "Tank Capacity must be > 0");
-        clearOutputs();
-        return;
-      }
-      if (!isFinite(fuelStopMinutes) || fuelStopMinutes <= 0) {
-        set("status", "Fuel Stop Minutes must be > 0");
-        clearOutputs();
-        return;
-      }
-      if (!isFinite(waitHours) || waitHours < 0) {
-        set("status", "Wait/Unload must be 0 or more");
-        clearOutputs();
-        return;
-      }
-
-      // MPG used (LOCKED): Scenario always uses Lifetime MPG
-const mpgUsed = lifetimeMpg;
-
-// Mirror Scenario MPG display (read-only)
-set("scenarioMpg", isFinite(lifetimeMpg) ? lifetimeMpg.toFixed(2) : "");
-set("mpgUsed", isFinite(mpgUsed) ? mpgUsed.toFixed(2) : "");
-
-      // Fuel
-      const gallonsNeeded = totalMiles / mpgUsed;
-      set("gallonsNeeded", gallonsNeeded.toFixed(2));
-
-      const fuelStops = Math.max(ceil(gallonsNeeded / tankCapacity) - 1, 0);
-      set("fuelStops", String(fuelStops));
-
-      const fuelStopHours = (fuelStops * fuelStopMinutes) / 60;
-      set("fuelStopHours", fuelStopHours.toFixed(2));
-
-      // DOT/HOS
-      const drivingHours = totalMiles / AVG_SPEED_MPH;
-      set("drivingHours", drivingHours.toFixed(2));
-
-      const dotBreak = drivingHours > 8 ? DOT_BREAK_HOURS : 0;
-      set("dotBreakHours", dotBreak.toFixed(2));
-
-      const dutyDays = ceil(drivingHours / MAX_DRIVE_PER_DAY);
-      set("dutyDays", String(dutyDays));
-
-      const resetHours = Math.max((dutyDays - 1) * RESET_HOURS, 0);
-      set("resetHours", resetHours.toFixed(2));
-
-      const totalHoursAway =
-        drivingHours +
-        dotBreak +
-        fuelStopHours +
-        waitHours +
-        resetHours;
-
-      set("totalHoursAway", totalHoursAway.toFixed(2));
-
-      set("status", "OK");
-    }
-
-    function clearOutputs() {
-      set("mpgUsed", "");
-      set("gallonsNeeded", "");
-      set("fuelStops", "");
-      set("fuelStopHours", "");
-      set("drivingHours", "");
-      set("dotBreakHours", "");
-      set("dutyDays", "");
-      set("resetHours", "");
-      set("totalHoursAway", "");
-    }
-
-    // Run once on load
-    runScenario();
-  
-syncModeUI();
-          function runScenario() {
-  // Read inputs
+function runScenario() {
+  // read inputs
   const totalMiles = num("totalMiles");
   const lifetimeMpg = num("lifetimeMpg");
-  const scenarioMpgRaw = str("scenarioMpg");
   const tankCapacity = num("tankCapacity");
   const fuelStopMinutes = num("fuelStopMinutes");
   const waitHours = num("waitHours");
 
-  // Basic validation
+  // basic validation
   if (!isFinite(totalMiles) || totalMiles <= 0) {
-    set("status", "Enter Total Miles > 0");
+    setVal("status", "Enter Total Miles > 0");
+    clearOutputs();
+    return;
+  }
+  if (!isFinite(lifetimeMpg) || lifetimeMpg <= 0) {
+    setVal("status", "Lifetime MPG must be > 0");
+    clearOutputs();
+    return;
+  }
+  if (!isFinite(tankCapacity) || tankCapacity <= 0) {
+    setVal("status", "Tank Capacity must be > 0");
+    clearOutputs();
+    return;
+  }
+  if (!isFinite(fuelStopMinutes) || fuelStopMinutes <= 0) {
+    setVal("status", "Fuel Stop Minutes must be > 0");
+    clearOutputs();
+    return;
+  }
+  if (!isFinite(waitHours) || waitHours < 0) {
+    setVal("status", "Wait/Unload must be 0 or more");
     clearOutputs();
     return;
   }
 
-  // MPG selection (scenario overrides lifetime if entered)
-  const mpgUsed =
-    isFinite(Number(scenarioMpgRaw)) && Number(scenarioMpgRaw) > 0
-      ? Number(scenarioMpgRaw)
-      : lifetimeMpg;
+  // OPTION B: LOCKED MPG
+  const mpgUsed = lifetimeMpg;
 
-  // Fuel math
+  // mirror scenario MPG display (read-only)
+  setVal("scenarioMpg", mpgUsed.toFixed(2));
+  setFirst(["mpgUsed"], mpgUsed.toFixed(2));
+
+  // fuel math
   const gallonsNeeded = totalMiles / mpgUsed;
-  const fuelStops = Math.max(0, ceil(gallonsNeeded / tankCapacity) - 1);
+  const fuelStops = Math.max(ceil(gallonsNeeded / tankCapacity) - 1, 0);
   const fuelStopTimeHours = (fuelStops * fuelStopMinutes) / 60;
 
-  // Write fuel outputs
-  set("mpgUsed", mpgUsed.toFixed(2));
-  set("estimatedGallons", gallonsNeeded.toFixed(2));
-  set("fuelStops", fuelStops);
-  set("fuelStopTimeHours", fuelStopTimeHours.toFixed(2));
+  setFirst(["estimatedGallons", "gallonsNeeded"], gallonsNeeded.toFixed(2));
+  setFirst(["fuelStops"], String(fuelStops));
+  setFirst(["fuelStopHours", "fuelStopTimeHours"], fuelStopTimeHours.toFixed(2));
 
-  // === SCENARIO TIME ENGINE ===
+  // time math
   const time = calculateScenarioTime({
     totalMiles,
     fuelStopTimeHours,
     waitUnloadHours: waitHours
   });
 
-  // Write time outputs
-  set("drivingHours", time.drivingHours.toFixed(2));
-  set("dotBreakHours", time.dotBreakHours.toFixed(2));
-  set("dutyDays", time.dutyDays);
-  set("resetHours", time.resetHours.toFixed(2));
-  set("totalHoursAway", time.totalHoursAway.toFixed(2));
-  set("loadDaysConsumed", time.loadDaysConsumed.toFixed(2));
-  set("status", time.status);
+  setFirst(["drivingHours"], time.drivingHours.toFixed(2));
+  setFirst(["dotBreakHours"], time.dotBreakHours.toFixed(2));
+  setFirst(["dutyDays"], String(time.dutyDays));
+  setFirst(["resetHours"], time.resetHours.toFixed(2));
+  setFirst(["totalHoursAway"], time.totalHoursAway.toFixed(2));
+  setFirst(["loadDaysConsumed"], time.loadDaysConsumed.toFixed(2));
+
+  setVal("status", time.status);
 }
+
+// Run once at load
+syncModelUI();
+runScenario();
   </script>
   </body>
 </html>
