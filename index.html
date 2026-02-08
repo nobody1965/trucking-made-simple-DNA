@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trucking Made Simple — Scenario</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      max-width: 420px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+
+    input[readonly] {
+      background: #eee;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Trucking Made Simple</h1>
+  <p><strong>Scenario Calculator (MVP)</strong></p>
+
+  <div class="card">
+    <label>Total Miles</label>
+    <input id="miles" type="number" value="700">
+
+    <label>Lifetime Avg MPG (read-only)</label>
+    <input id="avgMpg" type="number" value="7" readonly>
+
+    <label>MPG Used (Scenario)</label>
+    <input id="mpgUsed" type="number" readonly>
+
+    <label>Estimated Gallons</label>
+    <input id="gallons" type="number" readonly>
+
+    <button onclick="runScenario()">Run Scenario</button>
+  </div>
+
+  <script>
+    function runScenario() {
+      const miles = Number(document.getElementById("miles").value);
+      const avgMpg = Number(document.getElementById("avgMpg").value);
+
+      const mpgUsed = avgMpg;
+      const gallons = miles / mpgUsed;
+
+      document.getElementById("mpgUsed").value = mpgUsed.toFixed(2);
+      document.getElementById("gallons").value = gallons.toFixed(2);
+    }
+  </script>
+</body>
+</html>
