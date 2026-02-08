@@ -303,19 +303,12 @@ function syncModeUI() {
         return;
       }
 
-      // MPG used: scenario override if provided (and valid)
-      let mpgUsed = lifetimeMpg;
-      if (scenarioMpgRaw !== "") {
-        const scenarioMpg = Number(scenarioMpgRaw);
-        if (!isFinite(scenarioMpg) || scenarioMpg <= 0) {
-          set("status", "Avg MPG (Scenario) must be blank or > 0");
-          clearOutputs();
-          return;
-        }
-        mpgUsed = scenarioMpg;
-      }
+      // MPG used (LOCKED): Scenario always uses Lifetime MPG
+const mpgUsed = lifetimeMpg;
 
-      set("mpgUsed", mpgUsed.toFixed(2));
+// Mirror Scenario MPG display (read-only)
+set("scenarioMpg", isFinite(lifetimeMpg) ? lifetimeMpg.toFixed(2) : "");
+set("mpgUsed", isFinite(mpgUsed) ? mpgUsed.toFixed(2) : "");
 
       // Fuel
       const gallonsNeeded = totalMiles / mpgUsed;
