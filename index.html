@@ -131,7 +131,31 @@
   <input id="otherCosts" type="number" value="0" step="0.01" />
   <div class="note">Tolls, lumper, etc. (optional)</div>
 </div>
-      
+      <!-- RESERVES / WITHHOLDINGS (inputs) -->
+
+<div>
+  <label>Maintenance Reserve (%)</label>
+  <input id="reserveMaintPct" type="number" value="10" step="0.1" />
+  <div class="note">% of Net Revenue</div>
+</div>
+
+<div>
+  <label>Tax Reserve (%)</label>
+  <input id="reserveTaxPct" type="number" value="25" step="0.1" />
+  <div class="note">% of Net Revenue</div>
+</div>
+
+<div>
+  <label>Peace of Mind Reserve (%)</label>
+  <input id="reservePeacePct" type="number" value="5" step="0.1" />
+  <div class="note">% of Net Revenue</div>
+</div>
+
+<div>
+  <label>Household Withholding ($)</label>
+  <input id="householdWithhold" type="number" value="0" step="1" />
+  <div class="note">Optional fixed amount to pull off this trip</div>
+</div>
       
 
 <!-- RESERVES / WITHHOLDINGS (outputs) -->
