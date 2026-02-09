@@ -302,6 +302,100 @@
       </div>
 </div> <!-- CLOSES .grid -->
       <!-- ============================= -->
+  <!-- =========================
+Business Reserve (Scenario)
+Paste BELOW the </div><!-- closes .grid -->
+========================= -->
+
+<div class="divider"></div>
+
+<button class="sectionBtn" type="button" onclick="toggleSection('businessReserveSection')">
+  💼 Business Reserve (tap to open / close)
+</button>
+
+<div id="businessReserveSection" class="sectionContent">
+  <h3>Business Reserve (Scenario)</h3>
+  <div class="note">
+    This is your trucking business budget: truck/trailer payments, insurance, maintenance, permits/IFTA, downtime, replacement planning.
+    These withholds come out of <b>Net Revenue</b> so you know what you really take home.
+  </div>
+
+  <div class="grid">
+    <!-- Percent inputs -->
+    <div>
+      <label>Truck Payment % (input)</label>
+      <input id="bizTruckPayPct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <div>
+      <label>Trailer Payment % (input)</label>
+      <input id="bizTrailerPayPct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <div>
+      <label>Insurance % (input)</label>
+      <input id="bizInsurancePct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <div>
+      <label>Maintenance % (input)</label>
+      <input id="bizMaintPct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <div>
+      <label>Permits / IFTA % (input)</label>
+      <input id="bizPermitsPct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <div>
+      <label>Downtime / Replacement % (input)</label>
+      <input id="bizDowntimePct" type="number" value="0" step="0.1" oninput="runScenario()" />
+    </div>
+
+    <!-- Dollar outputs -->
+    <div>
+      <label>Truck Payment Reserve ($)</label>
+      <input id="bizTruckPayAmt" type="number" readonly />
+      <div class="note">Net Revenue × Truck Payment %</div>
+    </div>
+
+    <div>
+      <label>Trailer Payment Reserve ($)</label>
+      <input id="bizTrailerPayAmt" type="number" readonly />
+      <div class="note">Net Revenue × Trailer Payment %</div>
+    </div>
+
+    <div>
+      <label>Insurance Reserve ($)</label>
+      <input id="bizInsuranceAmt" type="number" readonly />
+      <div class="note">Net Revenue × Insurance %</div>
+    </div>
+
+    <div>
+      <label>Maintenance Reserve ($)</label>
+      <input id="bizMaintAmt" type="number" readonly />
+      <div class="note">Net Revenue × Maintenance %</div>
+    </div>
+
+    <div>
+      <label>Permits / IFTA Reserve ($)</label>
+      <input id="bizPermitsAmt" type="number" readonly />
+      <div class="note">Net Revenue × Permits/IFTA %</div>
+    </div>
+
+    <div>
+      <label>Downtime / Replacement Reserve ($)</label>
+      <input id="bizDowntimeAmt" type="number" readonly />
+      <div class="note">Net Revenue × Downtime %</div>
+    </div>
+
+    <div>
+      <label>Total Business Withheld ($)</label>
+      <input id="bizTotalWithheld" type="number" readonly />
+      <div class="note">Sum of all business reserve buckets</div>
+    </div>
+  </div>
+</div>
 <!-- Blueprint / DNA Button -->
 <!-- ============================= -->
 
@@ -614,6 +708,33 @@ const otherCosts = num("otherCosts");
 // Net Revenue = Revenue - Fuel Cost - Other Trip Costs
 const netRevenue = revenue - fuelCost - otherCosts;
 setVal("netRevenue", isFinite(netRevenue) ? netRevenue.toFixed(2) : "");
+
+// --- BUSINESS RESERVE (Scenario) ---
+const bizTruckPayPct = num("bizTruckPayPct") / 100;
+const bizTrailerPayPct = num("bizTrailerPayPct") / 100;
+const bizInsurancePct = num("bizInsurancePct") / 100;
+const bizMaintPct = num("bizMaintPct") / 100;
+const bizPermitsPct = num("bizPermitsPct") / 100;
+const bizDowntimePct = num("bizDowntimePct") / 100;
+
+const bizTruckPayAmt = netRevenue * bizTruckPayPct;
+const bizTrailerPayAmt = netRevenue * bizTrailerPayPct;
+const bizInsuranceAmt = netRevenue * bizInsurancePct;
+const bizMaintAmt = netRevenue * bizMaintPct;
+const bizPermitsAmt = netRevenue * bizPermitsPct;
+const bizDowntimeAmt = netRevenue * bizDowntimePct;
+
+setVal("bizTruckPayAmt", isFinite(bizTruckPayAmt) ? bizTruckPayAmt.toFixed(2) : "");
+setVal("bizTrailerPayAmt", isFinite(bizTrailerPayAmt) ? bizTrailerPayAmt.toFixed(2) : "");
+setVal("bizInsuranceAmt", isFinite(bizInsuranceAmt) ? bizInsuranceAmt.toFixed(2) : "");
+setVal("bizMaintAmt", isFinite(bizMaintAmt) ? bizMaintAmt.toFixed(2) : "");
+setVal("bizPermitsAmt", isFinite(bizPermitsAmt) ? bizPermitsAmt.toFixed(2) : "");
+setVal("bizDowntimeAmt", isFinite(bizDowntimeAmt) ? bizDowntimeAmt.toFixed(2) : "");
+
+const bizTotalWithheld =
+  bizTruckPayAmt + bizTrailerPayAmt + bizInsuranceAmt + bizMaintAmt + bizPermitsAmt + bizDowntimeAmt;
+
+setVal("bizTotalWithheld", isFinite(bizTotalWithheld) ? bizTotalWithheld.toFixed(2) : "");
 
 // $/mile = Net Revenue ÷ Total Miles
 const netPerMile = netRevenue / totalMiles;
