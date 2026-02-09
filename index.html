@@ -829,13 +829,6 @@ const bizReserveTotal =
 
 setVal("bizReserveTotal", isFinite(bizReserveTotal) ? bizReserveTotal.toFixed(2) : "");
 
-setVal("bizTruckPayAmt", isFinite(bizTruckPayAmt) ? bizTruckPayAmt.toFixed(2) : "");
-setVal("bizTrailerPayAmt", isFinite(bizTrailerPayAmt) ? bizTrailerPayAmt.toFixed(2) : "");
-setVal("bizInsuranceAmt", isFinite(bizInsuranceAmt) ? bizInsuranceAmt.toFixed(2) : "");
-setVal("bizMaintAmt", isFinite(bizMaintAmt) ? bizMaintAmt.toFixed(2) : "");
-setVal("bizPermitsAmt", isFinite(bizPermitsAmt) ? bizPermitsAmt.toFixed(2) : "");
-setVal("bizDowntimeAmt", isFinite(bizDowntimeAmt) ? bizDowntimeAmt.toFixed(2) : "");
-
 const bizTotalWithheld =
   bizTruckPayAmt + bizTrailerPayAmt + bizInsuranceAmt + bizMaintAmt + bizPermitsAmt + bizDowntimeAmt;
 
