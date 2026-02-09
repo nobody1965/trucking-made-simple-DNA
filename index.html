@@ -967,9 +967,7 @@ function toggleSection(id) {
   section.classList.add("open");
   section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-
-  }
-
+  
   tabs.forEach(btn => {
     btn.addEventListener("click", () => {
       const targetId = btn.dataset.target;
