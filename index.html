@@ -131,6 +131,45 @@
   <input id="otherCosts" type="number" value="0" step="0.01" />
   <div class="note">Tolls, lumper, etc. (optional)</div>
 </div>
+      
+      
+
+<!-- RESERVES / WITHHOLDINGS (outputs) -->
+<div>
+  <label>Maintenance Reserve ($)</label>
+  <input id="reserveMaint" type="number" readonly />
+  <div class="note">Net Revenue × Maintenance %</div>
+</div>
+
+<div>
+  <label>Tax Reserve ($)</label>
+  <input id="reserveTax" type="number" readonly />
+  <div class="note">Net Revenue × Tax %</div>
+</div>
+
+<div>
+  <label>Peace of Mind Reserve ($)</label>
+  <input id="reservePeace" type="number" readonly />
+  <div class="note">Net Revenue × Peace %</div>
+</div>
+
+<div>
+  <label>Total Withheld ($)</label>
+  <input id="totalWithheld" type="number" readonly />
+  <div class="note">Maintenance + Tax + Peace + Household</div>
+</div>
+
+<div>
+  <label>Take-Home After Withholds ($)</label>
+  <input id="takeHome" type="number" readonly />
+  <div class="note">Net Revenue − Total Withheld</div>
+</div>
+
+<div>
+  <label>O.T.R.A.F.F After Withholds ($/hr away)</label>
+  <input id="otrafTakeHome" type="number" readonly />
+  <div class="note">Take-Home ÷ Total Hours Away</div>
+</div>
       <div>
         <label>Status (read-only)</label>
         <input id="status" type="text" readonly />
