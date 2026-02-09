@@ -227,7 +227,8 @@
   </div>
   <div class="headerDivider"></div>
 </div>
-    
+    <div id="tripPage" class="tabPage activePage">
+
     <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Max driving/day = 11 hr • Reset = 10 hr</span>
 
     <div class="divider"></div>
@@ -238,6 +239,8 @@
 </button>
 <div id="tripSection" class="sectionContent open">
   
+<div id="scenarioPage" class="tabPage">
+
     <div class="grid">
       <!-- INPUTS -->
       <!-- =========================
@@ -376,7 +379,7 @@
   <input id="totalWithheld" type="number" readonly />
   <div class="note">Maintenance + Tax + Peace + Household</div>
 </div>
-
+8px
 <div>
   <label>Take-Home After Withholds ($)</label>
   <input id="takeHome" type="number" readonly />
@@ -504,7 +507,9 @@ Paste BELOW the </div><!-- closes .grid -->
     <input id="bizReserveTotal" type="number" readonly />
     <div class="note">Sum of all business reserves</div>
   </div>
-</div>
+  </div> <!-- closes tripSection -->
+</div> <!-- closes tripPage -->
+<div id="scenarioPage" class="tabPage">
 
   <div class="grid">
     <!-- Percent inputs -->
@@ -712,6 +717,7 @@ Paste BELOW the </div><!-- closes .grid -->
     <button onclick="runScenario()">Run Scenario</button>
   </div> <!-- closes scenarioSection -->
   </div>
+</div> <!-- closes scenarioPage -->
 
   
     
