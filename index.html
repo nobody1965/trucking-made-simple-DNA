@@ -197,7 +197,7 @@
 <button class="sectionBtn" type="button" onclick="toggleSection('tripSection')">
   🧾 Trip (tap to open / close)
 </button>
-<div id="tripSection" class="sectionContent open">
+<div id="tripSection" class="sectionContent">
   
     <div class="grid">
       <!-- INPUTS -->
@@ -580,7 +580,7 @@ Paste BELOW the </div><!-- closes .grid -->
   <button class="sectionBtn" type="button" onclick="toggleSection('scenarioSection')">
   🎯 Scenario (tap to open / close)
 </button>
-<div id="scenarioSection" class="sectionContent open">
+<div id="scenarioSection" class="sectionContent">
   <!-- OUTPUTS -->
       <div>
         <label>Estimated Gallons Needed (read-only)</label>
@@ -955,10 +955,19 @@ function toggleSection(id) {
   }
 
   function openAndScroll(targetId){
-    const section = document.getElementById(targetId);
-    if (!section) return;
-    section.classList.add("open");
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 1) close ALL sections
+  document.querySelectorAll(".sectionContent").forEach(sec => {
+    sec.classList.remove("open");
+  });
+
+  // 2) open the one we want
+  const section = document.getElementById(targetId);
+  if (!section) return;
+
+  section.classList.add("open");
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
   }
 
   tabs.forEach(btn => {
