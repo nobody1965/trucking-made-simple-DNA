@@ -320,6 +320,98 @@ Paste BELOW the </div><!-- closes .grid -->
     These withholds come out of <b>Net Revenue</b> so you know what you really take home.
   </div>
 
+  <div class="divider"></div>
+
+<h3>Business Reserve Inputs (Percent of Net Revenue)</h3>
+<div class="note">
+  Set your “withhold percentages” for the business side. These are taken from <b>Net Revenue</b> so you can plan payments and downtime.
+</div>
+
+<div class="grid">
+  <div>
+    <label>Truck Payment %</label>
+    <input id="bizTruckPayPct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Example: 18 = 18%</div>
+  </div>
+
+  <div>
+    <label>Trailer Payment %</label>
+    <input id="bizTrailerPayPct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Example: 6 = 6%</div>
+  </div>
+
+  <div>
+    <label>Insurance %</label>
+    <input id="bizInsurancePct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Weekly/monthly premium averaged out</div>
+  </div>
+
+  <div>
+    <label>Maintenance %</label>
+    <input id="bizMaintPct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Tires, oil, repairs, wear</div>
+  </div>
+
+  <div>
+    <label>Permits / IFTA %</label>
+    <input id="bizPermitsPct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Plates, permits, compliance</div>
+  </div>
+
+  <div>
+    <label>Downtime / Replacement %</label>
+    <input id="bizDowntimePct" type="number" value="0" oninput="runScenario()" />
+    <div class="note">Peace-of-mind buffer for breakdown weeks</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<h3>Business Reserve Outputs (Auto)</h3>
+<div class="grid">
+  <div>
+    <label>Truck Payment Reserve ($)</label>
+    <input id="bizTruckPayAmt" type="number" readonly />
+    <div class="note">Net Revenue × Truck %</div>
+  </div>
+
+  <div>
+    <label>Trailer Payment Reserve ($)</label>
+    <input id="bizTrailerPayAmt" type="number" readonly />
+    <div class="note">Net Revenue × Trailer %</div>
+  </div>
+
+  <div>
+    <label>Insurance Reserve ($)</label>
+    <input id="bizInsuranceAmt" type="number" readonly />
+    <div class="note">Net Revenue × Insurance %</div>
+  </div>
+
+  <div>
+    <label>Maintenance Reserve ($)</label>
+    <input id="bizMaintAmt" type="number" readonly />
+    <div class="note">Net Revenue × Maint %</div>
+  </div>
+
+  <div>
+    <label>Permits / IFTA Reserve ($)</label>
+    <input id="bizPermitsAmt" type="number" readonly />
+    <div class="note">Net Revenue × Permits %</div>
+  </div>
+
+  <div>
+    <label>Downtime Reserve ($)</label>
+    <input id="bizDowntimeAmt" type="number" readonly />
+    <div class="note">Net Revenue × Downtime %</div>
+  </div>
+
+  <div>
+    <label>Total Business Reserve ($)</label>
+    <input id="bizReserveTotal" type="number" readonly />
+    <div class="note">Sum of all business reserves</div>
+  </div>
+</div>
+
   <div class="grid">
     <!-- Percent inputs -->
     <div>
@@ -723,6 +815,19 @@ const bizInsuranceAmt = netRevenue * bizInsurancePct;
 const bizMaintAmt = netRevenue * bizMaintPct;
 const bizPermitsAmt = netRevenue * bizPermitsPct;
 const bizDowntimeAmt = netRevenue * bizDowntimePct;
+
+// Write Business Reserve outputs to the screen
+setVal("bizTruckPayAmt", isFinite(bizTruckPayAmt) ? bizTruckPayAmt.toFixed(2) : "");
+setVal("bizTrailerPayAmt", isFinite(bizTrailerPayAmt) ? bizTrailerPayAmt.toFixed(2) : "");
+setVal("bizInsuranceAmt", isFinite(bizInsuranceAmt) ? bizInsuranceAmt.toFixed(2) : "");
+setVal("bizMaintAmt", isFinite(bizMaintAmt) ? bizMaintAmt.toFixed(2) : "");
+setVal("bizPermitsAmt", isFinite(bizPermitsAmt) ? bizPermitsAmt.toFixed(2) : "");
+setVal("bizDowntimeAmt", isFinite(bizDowntimeAmt) ? bizDowntimeAmt.toFixed(2) : "");
+
+const bizReserveTotal =
+  bizTruckPayAmt + bizTrailerPayAmt + bizInsuranceAmt + bizMaintAmt + bizPermitsAmt + bizDowntimeAmt;
+
+setVal("bizReserveTotal", isFinite(bizReserveTotal) ? bizReserveTotal.toFixed(2) : "");
 
 setVal("bizTruckPayAmt", isFinite(bizTruckPayAmt) ? bizTruckPayAmt.toFixed(2) : "");
 setVal("bizTrailerPayAmt", isFinite(bizTrailerPayAmt) ? bizTrailerPayAmt.toFixed(2) : "");
