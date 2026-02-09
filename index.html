@@ -129,10 +129,58 @@
   .sectionContent.open{
     display:block;
   }
+    
+/* ============ YouTube-style Top Tabs ============ */
+.topTabs{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px 12px;
+  position:sticky;
+  top:0;
+  background:#111;
+  z-index:999;
+  white-space:nowrap;
+}
+
+.tabBtn{
+  border:0;
+  padding:10px 14px;
+  border-radius:999px;
+  background:#2a2a2a;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.tabBtn.active{
+  background:#fff;
+  color:#111;
+}
   </style>
 </head>
 
 <body>
+   <!-- TOP SCROLL BAR (YouTube-style tabs) -->
+  <div class="topTabs" id="topTabs">
+    <button class="tabBtn active" data-target="settingsSection">Settings</button>
+    <button class="tabBtn" data-target="tripSection">Trip</button>
+    <button class="tabBtn" data-target="scenarioSection">Scenario</button>
+    <button class="tabBtn" data-target="actualSection">Actual</button>
+    <button class="tabBtn" data-target="blueprintSection">Blueprint</button>
+    <button class="tabBtn" data-target="brokerSection">Broker</button>
+    <button class="tabBtn" data-target="invoiceSection">Invoice</button>
+    <button class="tabBtn" data-target="companySection">Company</button>
+    <button class="tabBtn" data-target="fuelSection">Fuel</button>
+    <button class="tabBtn" data-target="iftaSection">IFTA</button>
+    <button class="tabBtn" data-target="householdSection">Household</button>
+    <button class="tabBtn" data-target="businessSection">Business</button>
+    <button class="tabBtn" data-target="reservesSection">Reserves</button>
+    <button class="tabBtn" data-target="totalsSection">Totals</button>
+    <button class="tabBtn" data-target="dnaSection">Yearly DNA</button>
+    <button class="tabBtn" data-target="otraffSection">O.T.R.A.F.F</button>
+    <button class="tabBtn" data-target="plSection">Profit / Loss</button>
+  </div>
   <div class="card">
     <div class="headerBar">
   <h1>Trucking Made Simple</h1>
@@ -144,7 +192,13 @@
     <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Max driving/day = 11 hr • Reset = 10 hr</span>
 
     <div class="divider"></div>
-
+    
+<!-- TRIP SECTION (Data Entry Only) -->
+<button class="sectionBtn" type="button" onclick="toggleSection('tripSection')">
+  🧾 Trip (tap to open / close)
+</button>
+<div id="tripSection" class="sectionContent open">
+  
     <div class="grid">
       <!-- INPUTS -->
       <!-- =========================
@@ -301,6 +355,7 @@
         <div class="note">Tells you what’s missing</div>
       </div>
 </div> <!-- CLOSES .grid -->
+    </div> <!-- closes tripSection -->
       <!-- ============================= -->
   <!-- =========================
 Business Reserve (Scenario)
@@ -313,7 +368,7 @@ Paste BELOW the </div><!-- closes .grid -->
   💼 Business Reserve (tap to open / close)
 </button>
 
-<div id="businessReserveSection" class="sectionContent">
+<div id="businessSection" class="sectionContent">
   <h3>Business Reserve (Scenario)</h3>
   <div class="note">
     This is your trucking business budget: truck/trailer payments, insurance, maintenance, permits/IFTA, downtime, replacement planning.
@@ -521,6 +576,11 @@ Paste BELOW the </div><!-- closes .grid -->
   </div>
 </div>
   </div> <!-- closes blueprintSection -->
+  
+  <button class="sectionBtn" type="button" onclick="toggleSection('scenarioSection')">
+  🎯 Scenario (tap to open / close)
+</button>
+<div id="scenarioSection" class="sectionContent open">
   <!-- OUTPUTS -->
       <div>
         <label>Estimated Gallons Needed (read-only)</label>
@@ -611,6 +671,7 @@ Paste BELOW the </div><!-- closes .grid -->
   </div>
 </div>
     <button onclick="runScenario()">Run Scenario</button>
+  </div> <!-- closes scenarioSection -->
   </div>
 
   
@@ -883,6 +944,35 @@ function toggleSection(id) {
   section.classList.toggle("open");
 }
 // Run once at load
+// ===============================
+// Top Tabs -> open/scroll to sectionContent
+// ===============================
+(function () {
+  const tabs = document.querySelectorAll(".tabBtn");
+
+  function setActiveTab(targetId){
+    tabs.forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
+  }
+
+  function openAndScroll(targetId){
+    const section = document.getElementById(targetId);
+    if (!section) return;
+    section.classList.add("open");
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.dataset.target;
+      setActiveTab(targetId);
+      openAndScroll(targetId);
+    });
+  });
+
+  const first = document.querySelector(".tabBtn.active") || tabs[0];
+  if (first) first.click();
+})();
+  
 syncModelUI();
 runScenario();
   </script>
