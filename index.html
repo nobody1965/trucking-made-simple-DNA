@@ -54,6 +54,28 @@
       background: #e6e6e6;
       margin: 18px 0;
     }
+ /* =========================
+     Blueprint / DNA Sections
+     ========================= */
+  .sectionBtn{
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    background: #fafafa;
+    text-align:left;
+  }
+
+  .sectionContent{
+    display:none;
+    margin-top:10px;
+  }
+
+  .sectionContent.open{
+    display:block;
+  }
   </style>
 </head>
 
@@ -68,6 +90,28 @@
 
     <div class="grid">
       <!-- INPUTS -->
+      <!-- =========================
+     Blueprint / DNA Buttons
+     Paste BELOW the grid </div>
+     and ABOVE the <script>
+========================== -->
+
+
+
+  
+
+  <h3>Business Budget (coming next)</h3>
+  <div class="note">
+    Trucks • Trailers • Insurance • Payments • Maintenance • Permits • IFTA • Business Reserve
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Family / Household (DNA)</h3>
+  <div class="note">
+    This is where Household Withholding becomes real life: groceries, bills, kids, stability, and the true cost of time away.
+  </div>
+</div>
       <div>
   <label>Deadhead Miles (input)</label>
   <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
@@ -199,8 +243,42 @@
         <input id="status" type="text" readonly />
         <div class="note">Tells you what’s missing</div>
       </div>
+</div> <!-- CLOSES .grid -->
+      <!-- ============================= -->
+<!-- Blueprint / DNA Button -->
+<!-- ============================= -->
 
-      <!-- OUTPUTS -->
+<button class="sectionBtn" type="button" onclick="toggleSection('blueprintSection')">
+  📘 Blueprint (tap to open / close)
+</button>
+
+<div id="blueprintSection" class="sectionContent">
+  <div class="divider"></div>
+
+  <h3>Blueprint / DNA (Read-Only)</h3>
+  <div class="note">
+    This section explains the <b>why</b> behind the math.  
+    This is Trucking Made Simple DNA — education, not inputs.
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Business Budget (DNA)</h3>
+  <div class="note">
+    Trucks • Trailers • Payments • Insurance • Maintenance • Permits • IFTA •
+    Business Reserve • Downtime • Replacement Planning
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Family / Household (DNA)</h3>
+  <div class="note">
+    Household withholding represents real life: groceries, bills, kids,
+    stability, and protecting your family while you are O.T.R.A.F.F.
+  </div>
+</div>
+  </div> <!-- closes blueprintSection -->
+  <!-- OUTPUTS -->
       <div>
         <label>Estimated Gallons Needed (read-only)</label>
         <input id="gallonsNeeded" type="number" readonly />
@@ -520,7 +598,14 @@ setVal("otrafTakeHome", isFinite(otrafTakeHome) ? otrafTakeHome.toFixed(2) : "")
 if (time.status === "OK") setVal("status", "OK");
     
 }
-
+// ===============================
+// Blueprint / DNA Section Toggle
+// ===============================
+function toggleSection(id) {
+  const section = document.getElementById(id);
+  if (!section) return;
+  section.classList.toggle("open");
+}
 // Run once at load
 syncModelUI();
 runScenario();
