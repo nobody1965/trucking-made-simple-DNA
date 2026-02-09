@@ -445,22 +445,57 @@ setVal("fuelCost", isFinite(fuelCost) ? fuelCost.toFixed(2) : "");
   setFirst(["dutyDays"], String(time.dutyDays));
   setFirst(["resetHours"], time.resetHours.toFixed(2));
   setFirst(["totalHoursAway"], time.totalHoursAway.toFixed(2));
-
-    // --- Revenue + $/mile + O.T.R.A.F.F (Scenario) ---
+// --- Revenue + Fuel + Costs + O.T.R.A.F.F (Scenario) ---
 const revenue = num("revenue");
 const otherCosts = num("otherCosts");
-    const netRevenue = revenue - fuelCost - otherCosts;
 
+// fuel cost (already computed above in your code)
+// const fuelCost = ... (keep your fuelCost math above)
 
+// Net Revenue = Revenue - Fuel Cost - Other Trip Costs
+const netRevenue = revenue - fuelCost - otherCosts;
 setVal("netRevenue", isFinite(netRevenue) ? netRevenue.toFixed(2) : "");
 
+// $/mile = Net Revenue ÷ Total Miles
 const netPerMile = netRevenue / totalMiles;
 setVal("netPerMile", isFinite(netPerMile) ? netPerMile.toFixed(2) : "");
 
-const otraf = netRevenue / time.totalHoursAway; // $ per hour away
+// O.T.R.A.F.F = Net Revenue ÷ Total Hours Away
+const otraf = netRevenue / time.totalHoursAway;
 setVal("otraf", isFinite(otraf) ? otraf.toFixed(2) : "");
+
+// --- RESERVES / WITHHOLDS (Scenario) ---
+const reserveMaintPct = num("reserveMaintPct") / 100;
+const reserveTaxPct   = num("reserveTaxPct") / 100;
+const reservePeacePct = num("reservePeacePct") / 100;
+
+// Household fixed withholding (optional)
+const householdWithhold = num("householdWithhold");
+
+// Reserve $ amounts (based on Net Revenue)
+const reserveMaint = netRevenue * reserveMaintPct;
+const reserveTax   = netRevenue * reserveTaxPct;
+const reservePeace = netRevenue * reservePeacePct;
+
+setVal("reserveMaint", isFinite(reserveMaint) ? reserveMaint.toFixed(2) : "");
+setVal("reserveTax",   isFinite(reserveTax) ? reserveTax.toFixed(2) : "");
+setVal("reservePeace", isFinite(reservePeace) ? reservePeace.toFixed(2) : "");
+
+// Total withheld = reserves + household withholding
+const totalWithheld = reserveMaint + reserveTax + reservePeace + householdWithhold;
+setVal("totalWithheld", isFinite(totalWithheld) ? totalWithheld.toFixed(2) : "");
+
+// Take-home after withholds
+const takeHome = netRevenue - totalWithheld;
+setVal("takeHome", isFinite(takeHome) ? takeHome.toFixed(2) : "");
+
+// O.T.R.A.F.F after withholds = Take-home ÷ Total Hours Away
+const otrafTakeHome = takeHome / time.totalHoursAway;
+setVal("otrafTakeHome", isFinite(otrafTakeHome) ? otrafTakeHome.toFixed(2) : "");
+
+// keep your existing status behavior
+if (time.status === "OK") setVal("status", "OK");
     
-  if (time.status === "OK") setVal("status", "OK");
 }
 
 // Run once at load
