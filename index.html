@@ -5,6 +5,44 @@
   <title>Trucking Made Simple – Scenario (DOT/HOS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+
+  /* ================================
+   STEP 1 — TAB PAGE SYSTEM
+   ================================ */
+
+.tabPage {
+  display: none;
+}
+
+.tabPage.activePage {
+  display: block;
+}
+
+.topTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px;
+  background: #111;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.tabBtn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tabBtn.active {
+  background: #fff;
+  color: #000;
+}
     
   body {
   font-family: Arial, sans-serif;
@@ -163,23 +201,23 @@
 <body>
    <!-- TOP SCROLL BAR (YouTube-style tabs) -->
   <div class="topTabs" id="topTabs">
-    <button class="tabBtn active" data-target="settingsSection">Settings</button>
-    <button class="tabBtn" data-target="tripSection">Trip</button>
-    <button class="tabBtn" data-target="scenarioSection">Scenario</button>
-    <button class="tabBtn" data-target="actualSection">Actual</button>
-    <button class="tabBtn" data-target="blueprintSection">Blueprint</button>
-    <button class="tabBtn" data-target="brokerSection">Broker</button>
-    <button class="tabBtn" data-target="invoiceSection">Invoice</button>
-    <button class="tabBtn" data-target="companySection">Company</button>
-    <button class="tabBtn" data-target="fuelSection">Fuel</button>
-    <button class="tabBtn" data-target="iftaSection">IFTA</button>
-    <button class="tabBtn" data-target="householdSection">Household</button>
-    <button class="tabBtn" data-target="businessSection">Business</button>
-    <button class="tabBtn" data-target="reservesSection">Reserves</button>
-    <button class="tabBtn" data-target="totalsSection">Totals</button>
-    <button class="tabBtn" data-target="dnaSection">Yearly DNA</button>
-    <button class="tabBtn" data-target="otraffSection">O.T.R.A.F.F</button>
-    <button class="tabBtn" data-target="plSection">Profit / Loss</button>
+    <button class="tabBtn active" data-target="settingsPage">Settings</button>
+    <button class="tabBtn" data-target="tripPage">Trip</button>
+    <button class="tabBtn" data-target="scenarioPage">Scenario</button>
+    <button class="tabBtn" data-target="actualPage">Actual</button>
+    <button class="tabBtn" data-target="blueprintPage">Blueprint</button>
+    <button class="tabBtn" data-target="brokerPage">Broker</button>
+    <button class="tabBtn" data-target="invoicePage">Invoice</button>
+    <button class="tabBtn" data-target="companyPage">Company</button>
+    <button class="tabBtn" data-target="fuelPage">Fuel</button>
+    <button class="tabBtn" data-target="iftaPage">IFTA</button>
+    <button class="tabBtn" data-target="householdPage">Household</button>
+    <button class="tabBtn" data-target="businessPage">Business</button>
+    <button class="tabBtn" data-target="reservesPage">Reserves</button>
+    <button class="tabBtn" data-target="totalsPage">Totals</button>
+    <button class="tabBtn" data-target="dnaPage">Yearly DNA</button>
+    <button class="tabBtn" data-target="otraffPage">O.T.R.A.F.F</button>
+    <button class="tabBtn" data-target="plPage">Profit / Loss</button>
   </div>
   <div class="card">
     <div class="headerBar">
@@ -189,6 +227,7 @@
   </div>
   <div class="headerDivider"></div>
 </div>
+    
     <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Max driving/day = 11 hr • Reset = 10 hr</span>
 
     <div class="divider"></div>
@@ -975,6 +1014,27 @@ function toggleSection(id) {
   
 syncModelUI();
 runScenario();
+
+   const tabs = document.querySelectorAll(".tabBtn");
+
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+
+      // hide all pages
+      document.querySelectorAll(".tabPage").forEach(p =>
+        p.classList.remove("activePage")
+      );
+
+      // show target page
+      const page = document.getElementById(target);
+      if (page) page.classList.add("activePage");
+
+      // highlight active tab
+      tabs.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
   </script>
   </body>
 </html>
