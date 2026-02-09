@@ -121,7 +121,11 @@
   <input id="revenue" type="number" value="0" step="0.01" />
   <div class="note">Gross trip pay</div>
 </div>
-
+<div>
+  <label>Fuel Price ($/gal) (input)</label>
+  <input id="fuelPrice" type="number" value="0" step="0.01" />
+  <div class="note">Used to estimate fuel cost</div>
+</div>
 <div>
   <label>Other Trip Costs (input)</label>
   <input id="otherCosts" type="number" value="0" step="0.01" />
@@ -138,7 +142,11 @@
         <label>Estimated Gallons Needed (read-only)</label>
         <input id="gallonsNeeded" type="number" readonly />
       </div>
-
+<div>
+  <label>Estimated Fuel Cost (read-only)</label>
+  <input id="fuelCost" type="number" readonly />
+  <div class="note">Estimated Gallons Needed × Fuel Price</div>
+</div>
       <div>
         <label>Fuel Stops (read-only)</label>
         <input id="fuelStops" type="number" readonly />
@@ -379,7 +387,11 @@ function updateTotalMilesFromParts() {
   const fuelStopTimeHours = (fuelStops * fuelStopMinutes) / 60;
 
   setFirst(["estimatedGallons", "gallonsNeeded"], gallonsNeeded.toFixed(2));
-  setFirst(["fuelStops"], String(fuelStops));
+  // fuel cost math
+const fuelPrice = num("fuelPrice");
+const fuelCost = gallonsNeeded * fuelPrice;
+setVal("fuelCost", isFinite(fuelCost) ? fuelCost.toFixed(2) : "");
+    setFirst(["fuelStops"], String(fuelStops));
   setFirst(["fuelStopHours", "fuelStopTimeHours"], fuelStopTimeHours.toFixed(2));
 
   // time math
@@ -394,11 +406,13 @@ function updateTotalMilesFromParts() {
   setFirst(["dutyDays"], String(time.dutyDays));
   setFirst(["resetHours"], time.resetHours.toFixed(2));
   setFirst(["totalHoursAway"], time.totalHoursAway.toFixed(2));
-  // --- Revenue + $/mile + O.T.R.A.F.F (Scenario) ---
+
+    // --- Revenue + $/mile + O.T.R.A.F.F (Scenario) ---
 const revenue = num("revenue");
 const otherCosts = num("otherCosts");
+    const netRevenue = revenue - fuelCost - otherCosts;
 
-const netRevenue = revenue - otherCosts;
+
 setVal("netRevenue", isFinite(netRevenue) ? netRevenue.toFixed(2) : "");
 
 const netPerMile = netRevenue / totalMiles;
