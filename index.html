@@ -1115,28 +1115,22 @@ if (time.status === "OK") setVal("status", "OK");
 // ===============================
 // Blueprint / DNA Section Toggle
 // ===============================
+
 function toggleSection(id) {
   const section = document.getElementById(id);
-  if (!section) return;
+
+  // DEBUG: prove click is firing + prove the id exists
+  if (!section) {
+    alert("❌ Missing section id: " + id);
+    return;
+  }
+
   section.classList.toggle("open");
+
+  // DEBUG: prove the class is actually being added/removed
+  alert("✅ Toggled: " + id + "\nopen = " + section.classList.contains("open"));
 }
-// Run once at load
-// ===============================
-// Top Tabs -> open/scroll to sectionContent
-// ===============================
-(function () {
-  const tabs = document.querySelectorAll(".tabBtn");
 
-  function setActiveTab(targetId){
-    tabs.forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
-  }
-
-  function openAndScroll(targetId){
-    const section = document.getElementById(targetId);
-    if (!section) return;
-    section.classList.add("open");
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 
   tabs.forEach(btn => {
     btn.addEventListener("click", () => {
