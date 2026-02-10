@@ -1115,43 +1115,45 @@ if (time.status === "OK") setVal("status", "OK");
 // ===============================
 // Blueprint / DNA Section Toggle
 // ===============================
-
+<script>
+// ==============================
+// Section Toggle (open / close)
+// ==============================
 function toggleSection(id) {
   const section = document.getElementById(id);
-
-  // DEBUG: prove click is firing + prove the id exists
-  if (!section) {
-    alert("❌ Missing section id: " + id);
-    return;
-  }
-
+  if (!section) return;
   section.classList.toggle("open");
-
-  // DEBUG: prove the class is actually being added/removed
-  alert("✅ Toggled: " + id + "\nopen = " + section.classList.contains("open"));
 }
 
+// ==============================
+// Top Tabs (Settings / Trip / Scenario / Actual / etc.)
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const tabButtons = document.querySelectorAll(".tabBtn");
+  const tabPages = document.querySelectorAll(".tabPage");
 
-  tabs.forEach(btn => {
+  function setActiveTab(targetId) {
+    tabButtons.forEach(btn => btn.classList.remove("active"));
+    tabPages.forEach(page => page.classList.remove("activePage"));
+
+    const activeBtn = document.querySelector(`[data-target="${targetId}"]`);
+    const activePage = document.getElementById(targetId);
+
+    if (activeBtn) activeBtn.classList.add("active");
+    if (activePage) activePage.classList.add("activePage");
+  }
+
+  tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      const targetId = btn.dataset.target;
-      setActiveTab(targetId);
-      openAndScroll(targetId);
+      setActiveTab(btn.dataset.target);
     });
   });
 
-  const first = document.querySelector(".tabBtn.active") || tabs[0];
-  if (first) first.click();
-})();
-  
-syncModelUI();
-runScenario();
+  // Default tab on load
+  setActiveTab("settingsPage");
+});
+</script>
 
-   const tabs = document.querySelectorAll(".tabBtn");
-
-  tabs.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.target;
 
       // hide all pages
       document.querySelectorAll(".tabPage").forEach(p =>
