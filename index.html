@@ -718,6 +718,46 @@ Paste BELOW the </div><!-- closes .grid -->
   </div> <!-- closes scenarioSection -->
   </div>
 </div> <!-- closes scenarioPage -->
+<div id="actualPage" class="tabPage">
+
+  <span class="badge">
+    Actual Mode (Read-Only until Delivered)
+  </span>
+
+  <div class="divider"></div>
+
+  <!-- ACTUAL SECTION -->
+  <button class="sectionBtn" type="button" onclick="toggleSection('actualSection')">
+    📦 Actual Trip (tap to open / close)
+  </button>
+
+  <div id="actualSection" class="sectionContent">
+    <div class="grid">
+
+      <div>
+        <label>Actual Revenue ($)</label>
+        <input id="actualRevenue" type="number" readonly />
+      </div>
+
+      <div>
+        <label>Actual Total Miles</label>
+        <input id="actualMiles" type="number" readonly />
+      </div>
+
+      <div>
+        <label>Actual Hours Away</label>
+        <input id="actualHoursAway" type="number" readonly />
+      </div>
+
+      <div>
+        <label>O.T.R.A.F.F (Actual $/hr)</label>
+        <input id="actualOtraf" type="number" readonly />
+      </div>
+
+    </div>
+  </div>
+
+</div> <!-- closes actualPage -->
 
   
     
