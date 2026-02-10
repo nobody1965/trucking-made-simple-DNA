@@ -166,23 +166,124 @@
 
       <!-- ===================== TAB PAGES START (ALL SIBLINGS) ===================== -->
 
-      <div id="settingsPage" class="tabPage activePage">
-        <h3>Settings</h3>
-        <div class="note">
-          This page is for defaults, constants, and your “how I run my truck” choices.
-        </div>
+<div id="settingsPage" class="tabPage activePage">
+  <h3>Settings</h3>
 
-        <button class="sectionBtn" type="button" onclick="toggleSection('settingsBusinessReserveSection')">
-          💼 Business Reserve (tap to open / close)
-        </button>
+  <div class="note">
+    🔒 Settings control <strong>preferences and defaults only</strong>.<br>
+    They do <strong>not</strong> change Scenario math, formulas, or historical truth.
+  </div>
 
-        <div id="settingsBusinessReserveSection" class="sectionContent">
-          <div class="note">
-            This reserve protects the truck so your household doesn’t have to.<br/>
-            (Settings version = your default target rules, not Scenario math.)
-          </div>
-        </div>
+  <div class="divider"></div>
+
+  <!-- ================= BUSINESS RESERVE DEFAULTS ================= -->
+  <button class="sectionBtn" type="button" onclick="toggleSection('settingsBusinessReserveSection')">
+    💼 Business Reserve Defaults (tap to open / close)
+  </button>
+
+  <div id="settingsBusinessReserveSection" class="sectionContent">
+    <div class="note">
+      These are your <strong>target rules</strong> for how you like to run your truck.<br>
+      Scenario and Actual calculations may differ based on reality.
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Default Business Reserve %</label>
+        <input id="setBusinessReservePct" type="number" placeholder="e.g. 18" />
+        <div class="note">Used as a starting assumption only.</div>
       </div>
+
+      <div>
+        <label>Default Maintenance Slice %</label>
+        <input id="setMaintenancePct" type="number" placeholder="e.g. 8" />
+        <div class="note">Tires • oil • breakdown buffer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DISPLAY & UX ================= -->
+  <button class="sectionBtn" type="button" onclick="toggleSection('settingsDisplaySection')">
+    🖥️ Display & UX (tap to open / close)
+  </button>
+
+  <div id="settingsDisplaySection" class="sectionContent">
+    <div class="note">
+      These settings only affect how information is shown.
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>
+          <input type="checkbox" id="setDarkMode">
+          Dark Mode
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <input type="checkbox" id="setTooltips" checked>
+          Show explanations & tips
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LOCK NOTICE ================= -->
+  <div class="divider"></div>
+
+  <div class="note">
+    🔐 <strong>Plain Lock Rule:</strong><br>
+    If it affects money math, time math, or O.T.R.A.F.F — it does not belong in Settings.
+
+    <!-- ================= PLAIN LOCK NOTICE (HARD FENCE) ================= -->
+  <div class="divider"></div>
+
+  <div class="lockBox">
+    <div class="lockTitle">🔒 Plain Lock — What Settings Can’t Change</div>
+    <div class="note">
+      Settings are <strong>preferences + defaults only</strong>.<br>
+      They cannot modify:
+      <ul class="lockList">
+        <li>Scenario math / formulas</li>
+        <li>O.T.R.A.F.F calculation</li>
+        <li>Actual history / totals</li>
+        <li>Locked constants used by the Blueprint</li>
+      </ul>
+      If it affects money math, time math, or truth — it does not belong in Settings.
+    </div>
+  </div>
+
+  <!-- ================= SAVE / RESET (PREFERENCES ONLY) ================= -->
+  <div class="saveRow">
+    <button class="sectionBtn" type="button" onclick="saveSettingsPlainLock()">
+      💾 Save Settings (Preferences Only)
+    </button>
+
+    <button class="sectionBtn" type="button" onclick="resetSettingsPlainLock()">
+      ♻️ Reset to Defaults
+    </button>
+
+    <div id="settingsSavedMsg" class="note" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- ================= STORAGE KEYS (VERSIONED) ================= -->
+  <!--
+    PC-SETTINGS-LOCK v1.0 (storage)
+    storageKey: TMS_SETTINGS_v1
+
+    fields:
+      - businessReservePct (number)
+      - maintenancePct (number)
+      - darkMode (boolean)
+      - tooltips (boolean)
+
+    rule:
+      - Settings may store preferences only.
+      - Settings never write to Scenario/Actual calculations or history.
+  -->
+  </div>
+</div>
 
       <div id="tripPage" class="tabPage">
         <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Fuel stop min = 15 min</span>
@@ -513,7 +614,89 @@ function clearScenarioOutputs(){
     "scenNet"
   ].forEach(id => setVal(id, ""));
 }
+    
+// =====================
+// 🔒 PLAIN LOCK SETTINGS v1.0 (PREFERENCES ONLY)
+// =====================
+const TMS_SETTINGS_STORAGE_KEY = "TMS_SETTINGS_v1";
 
+const TMS_SETTINGS_DEFAULTS = {
+  businessReservePct: 18,
+  maintenancePct: 8,
+  darkMode: false,
+  tooltips: true
+};
+
+function getSettingsInputs(){
+  return {
+    businessReservePctEl: document.getElementById("setBusinessReservePct"),
+    maintenancePctEl: document.getElementById("setMaintenancePct"),
+    darkModeEl: document.getElementById("setDarkMode"),
+    tooltipsEl: document.getElementById("setTooltips"),
+    msgEl: document.getElementById("settingsSavedMsg")
+  };
+}
+
+function loadSettingsPlainLock(){
+  const { businessReservePctEl, maintenancePctEl, darkModeEl, tooltipsEl } = getSettingsInputs();
+  if (!businessReservePctEl || !maintenancePctEl || !darkModeEl || !tooltipsEl) return;
+
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(TMS_SETTINGS_STORAGE_KEY) || "null");
+  } catch (e) {
+    saved = null;
+  }
+
+  const s = { ...TMS_SETTINGS_DEFAULTS, ...(saved || {}) };
+
+  businessReservePctEl.value = s.businessReservePct;
+  maintenancePctEl.value = s.maintenancePct;
+  darkModeEl.checked = !!s.darkMode;
+  tooltipsEl.checked = !!s.tooltips;
+
+  // Optional UI application (safe)
+  document.body.classList.toggle("darkMode", !!s.darkMode);
+}
+
+function saveSettingsPlainLock(){
+  const { businessReservePctEl, maintenancePctEl, darkModeEl, tooltipsEl, msgEl } = getSettingsInputs();
+  if (!businessReservePctEl || !maintenancePctEl || !darkModeEl || !tooltipsEl) return;
+
+  const businessReservePct = Number(businessReservePctEl.value);
+  const maintenancePct = Number(maintenancePctEl.value);
+
+  // Guardrails (preferences only)
+  const safe = {
+    businessReservePct: isFinite(businessReservePct) ? Math.max(0, Math.min(40, businessReservePct)) : TMS_SETTINGS_DEFAULTS.businessReservePct,
+    maintenancePct: isFinite(maintenancePct) ? Math.max(0, Math.min(40, maintenancePct)) : TMS_SETTINGS_DEFAULTS.maintenancePct,
+    darkMode: !!darkModeEl.checked,
+    tooltips: !!tooltipsEl.checked
+  };
+
+  localStorage.setItem(TMS_SETTINGS_STORAGE_KEY, JSON.stringify(safe));
+
+  // Apply UI-only effects
+  document.body.classList.toggle("darkMode", safe.darkMode);
+
+  if (msgEl){
+    msgEl.textContent = "✅ Saved. (Preferences only — math is locked.)";
+  }
+}
+
+function resetSettingsPlainLock(){
+  localStorage.setItem(TMS_SETTINGS_STORAGE_KEY, JSON.stringify(TMS_SETTINGS_DEFAULTS));
+  loadSettingsPlainLock();
+  const { msgEl } = getSettingsInputs();
+  if (msgEl){
+    msgEl.textContent = "♻️ Reset to defaults. (Preferences only — math is locked.)";
+  }
+}
+
+// Load settings at startup (does not touch Scenario/Actual math)
+document.addEventListener("DOMContentLoaded", () => {
+  loadSettingsPlainLock();
+});
   </script>
 
 </body>
