@@ -1,247 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Trucking Made Simple – Scenario (DOT/HOS)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trucking Made Simple</title>
+
   <style>
-
-  /* ================================
-   STEP 1 — TAB PAGE SYSTEM
-   ================================ */
-
-.tabPage {
-  display: none;
-}
-
-.tabPage.activePage {
-  display: block;
-}
-
-.topTabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 10px;
-  background: #111;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.tabBtn {
-  border: none;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #333;
-  color: #fff;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.tabBtn.active {
-  background: #fff;
-  color: #000;
-}
-    
-  body {
-  font-family: Arial, sans-serif;
-  background: #0b2a4a; /* blue background */
-  padding: 20px;
-  }
-
-/* ===== Header bar inside the card ===== */
-.headerBar {
-  background: #06315a;   /* darker blue */
-  color: white;
-  padding: 14px 18px;
-  border-radius: 12px 12px 0 0;
-  margin: -20px -20px 18px -20px;
-}
-
-  .headerDivider {
-  height: 1px;
-  background: rgba(255,255,255,0.25);
-  margin-top: 10px;
-}
-
-.headerBar h1 {
-  margin: 0;
-  font-size: 22px;
-}
-
-.headerBar .sub {
-  font-size: 13px;
-  opacity: 0.9;
-  margin-top: 4px;
-}
-
-.headerBar label,
-  .headerBar h1,
-  .headerBar .sub {
-  color: white;
-}
-
-    
-    .card {
-      max-width: 760px;
-      margin: auto;
-      background:#fff;
-      padding:20px;
-      border-radius:8px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    }
-    h1 { margin: 0 0 6px 0; }
-    h3 { margin: 0 0 16px 0; font-weight: normal; color:#333; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-    
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 2px;
-      color: #222;
+    :root{
+      --bg:#0b0c10;
+      --card:#121420;
+      --text:#e9e9f1;
+      --muted:#aeb2c7;
+      --line:#242844;
+      --pill:#1a1f34;
+      --pillActive:#2a3270;
+      --btn:#1a1f34;
+      --btnHover:#232a4a;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
-    input[readonly] { background:#eee; }
-    
-    .note {
-      font-size: 12px;
-      color: #dbe9ff;
-      margin-top: 6px;
-      line-height: 1.3;
+
+    /* Top scroll tabs (YouTube-style) */
+    .topTabs{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display:flex;
+      gap:8px;
+      padding:10px;
+      overflow-x:auto;
+      background: rgba(11,12,16,.95);
+      border-bottom:1px solid var(--line);
+      -webkit-overflow-scrolling: touch;
     }
-    
-    .row { margin-top: 12px; }
-    button {
-      margin-top: 18px;
-      padding: 12px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 8px;
-      border: 1px solid #bbb;
-      background: #f2f2f2;
+    .tabBtn{
+      flex: 0 0 auto;
+      border:1px solid var(--line);
+      background:var(--pill);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+      font-weight:600;
     }
-    .badge {
+    .tabBtn.active{
+      background:var(--pillActive);
+      border-color:#3c46a8;
+    }
+
+    /* Main card */
+    .wrap{ max-width:980px; margin: 14px auto; padding: 0 12px; }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .headerBar{ margin-bottom:8px; }
+    h1{ margin:4px 0 0; font-size:22px; }
+    .sub{ color:var(--muted); margin:6px 0 10px; font-size:14px; }
+    .headerDivider, .divider{ height:1px; background:var(--line); margin:12px 0; }
+
+    .badge{
       display:inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background:#f0f0f0;
-      font-size: 12px;
-      margin-top: 10px;
+      background:#0f1326;
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
     }
-    .divider {
-      height: 1px;
-      background: #e6e6e6;
-      margin: 18px 0;
+
+    /* Pages */
+    .tabPage{ display:none; }
+    .tabPage.activePage{ display:block; }
+
+    /* Sections (open/close) */
+    .sectionBtn{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--line);
+      background:var(--btn);
+      color:var(--text);
+      padding:12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      margin-top:10px;
     }
- /* =========================
-     Blueprint / DNA Sections
-     ========================= */
-  .sectionBtn{
-    margin-top: 10px;
-    padding: 10px;
-    width: 100%;
-    font-size: 15px;
-    border-radius: 8px;
-    border: 1px solid #bbb;
-    background: #fafafa;
-    text-align:left;
-  }
+    .sectionBtn:hover{ background:var(--btnHover); }
 
-  .sectionContent{
-    display:none;
-    margin-top:10px;
-  }
+    .sectionContent{
+      display:none;
+      border:1px dashed var(--line);
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+      background:#0f1222;
+    }
+    .sectionContent.open{ display:block; }
 
-  .sectionContent.open{
-    display:block;
-  }
-    
-/* ============ YouTube-style Top Tabs ============ */
-.topTabs{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding:10px 12px;
-  position:sticky;
-  top:0;
-  background:#111;
-  z-index:999;
-  white-space:nowrap;
-}
+    .note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
 
-.tabBtn{
-  border:0;
-  padding:10px 14px;
-  border-radius:999px;
-  background:#2a2a2a;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
+    /* Simple grid for inputs */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    label{ display:block; font-weight:700; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#0b0e1c;
+      color:var(--text);
+      font-size:16px;
+    }
+    input[readonly]{ opacity:.85; }
 
-.tabBtn.active{
-  background:#fff;
-  color:#111;
-}
- /* SAFETY OVERRIDE: allow typing in Scenario inputs */
-#secScenario input,
-#secScenario select,
-#secScenario textarea {
-  pointer-events: auto !important;
-  user-select: auto !important;
-}
- #secScenario input[readonly]{
-  pointer-events: auto !important;
- }
+    @media (max-width:700px){
+      .grid{ grid-template-columns: 1fr; }
+    }
   </style>
-/* ===== Section toggle behavior ===== */
-.sectionContent {
-  display: none;
-}
-
-.sectionContent.open {
-  display: block;
-}
-
-/* Ensure buttons are clickable */
-.sectionBtn {
-  position: relative;
-  z-index: 2;
-}
-
-.sectionContent {
-  position: relative;
-  z-index: 1;
-}
 </head>
 
-
 <body>
-   <!-- TOP SCROLL BAR (YouTube-style tabs) -->
+
+  <!-- TOP SCROLL BAR -->
   <div class="topTabs" id="topTabs">
     <button class="tabBtn active" data-target="settingsPage">Settings</button>
     <button class="tabBtn" data-target="tripPage">Trip</button>
     <button class="tabBtn" data-target="scenarioPage">Scenario</button>
     <button class="tabBtn" data-target="actualPage">Actual</button>
-    <button class="tabBtn" data-target="blueprintPage">Blueprint</button>
-    <button class="tabBtn" data-target="brokerPage">Broker</button>
-    <button class="tabBtn" data-target="invoicePage">Invoice</button>
-    <button class="tabBtn" data-target="companyPage">Company</button>
-    <button class="tabBtn" data-target="fuelPage">Fuel</button>
-    <button class="tabBtn" data-target="iftaPage">IFTA</button>
-    <button class="tabBtn" data-target="householdPage">Household</button>
     <button class="tabBtn" data-target="businessPage">Business</button>
     <button class="tabBtn" data-target="reservesPage">Reserves</button>
     <button class="tabBtn" data-target="totalsPage">Totals</button>
@@ -249,926 +155,214 @@
     <button class="tabBtn" data-target="otraffPage">O.T.R.A.F.F</button>
     <button class="tabBtn" data-target="plPage">Profit / Loss</button>
   </div>
-  <div class="card">
-    <div class="headerBar">
-  <h1>Trucking Made Simple</h1>
-  <div class="sub">
-    Scenario Calculator • Revenue • O.T.R.A.F.F • Time Away From Family
-  </div>
-  <div class="headerDivider"></div>
-</div>
 
-<!-- ================= TAB PAGES START ================= -->
-
-<div id="settingsPage" class="tabPage">
-  <h3>Settings</h3>
-</div>
-
-<div id="scenarioPage" class="tabPage">
-  <div class="grid">
-
-    <div>
-      <label>Deadhead Miles (input)</label>
-      <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-    </div>
-
-    <div>
-      <label>Loaded Miles (input)</label>
-      <input id="loadedMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-    </div>
-
-    <div>
-      <label>Return Miles (input)</label>
-      <input id="returnMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-    </div>
-
-    <div>
-      <label>Total Miles (auto)</label>
-      <input id="totalMiles" type="number" readonly />
-      <div class="note">Deadhead + Loaded + Return</div>
-    </div>
-
-  </div>
-</div> <!-- closes scenarioPage -->
-
-<div id="actualPage" class="tabPage">
-  <!-- ACTUAL INPUTS GO HERE (kept separate on purpose) -->
-</div>
-<!-- ============== BUSINESS & RESERVES PAGES ============== -->
-
-<div id="businessPage" class="tabPage">
-  <h3>Business</h3>
-
-  <div class="note">
-    Truck & trailer payments • Insurance • Permits • Maintenance • Downtime
-  </div>
-
-  <button class="sectionBtn"
-          type="button"
-          onclick="toggleSection('businessReserveSection')">
-    💼 Business Reserve (tap to open / close)
-  </button>
-
-  <div id="businessReserveSection" class="sectionContent">
-    <div class="note">
-      This reserve protects the truck so your household doesn’t have to.
-    </div>
-  </div>
-</div>
-
-<div id="reservesPage" class="tabPage">
-  <h3>Reserves</h3>
-
-  <div class="note">
-    Money set aside before take-home — on purpose.
-  </div>
-
-  <button class="sectionBtn"
-          type="button"
-          onclick="toggleSection('scenarioReserveSection')">
-    🧠 Scenario Reserves (tap to open / close)
-  </button>
-
-  <div id="scenarioReserveSection" class="sectionContent">
-    <div class="note">
-      Maintenance • Tax • Peace-of-Mind reserves calculated from Scenario.
-    </div>
-  </div>
-</div>
-
-<!-- ============== END BUSINESS & RESERVES PAGES ============== -->
-
-<!-- ================= TAB PAGES CONTINUE ================= -->
-    <div id="tripPage" class="tabPage activePage">
-
-    <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Max driving/day = 11 hr • Reset = 10 hr</span>
-
-    <div class="divider"></div>
-    
-<!-- TRIP SECTION (Data Entry Only) -->
-<button class="sectionBtn" type="button" onclick="toggleSection('tripSection')">
-  🧾 Trip (tap to open / close)
-</button>
-<div id="tripSection" class="sectionContent open">
-  
-
-
-      <div>
-        <label>Lifetime Avg MPG (read-only)</label>
-        <input id="lifetimeMpg" type="number" value="7" readonly />
-        <div class="note">From Actual fuel history</div>
+  <div class="wrap">
+    <div class="card">
+      <div class="headerBar">
+        <h1>Trucking Made Simple</h1>
+        <div class="sub">Scenario Calculator • Revenue • O.T.R.A.F.F • Time Away From Family</div>
+        <div class="headerDivider"></div>
       </div>
 
-      <label>Avg MPG (Scenario) (read-only)</label>
-<input id="scenarioMpg" type="number" readonly />
-<div class="note">Always mirrors Lifetime MPG</div>
-      
+      <!-- ===================== TAB PAGES START (ALL SIBLINGS) ===================== -->
 
-      <div>
-        <label>Tank Capacity (gallons) (input)</label>
-        <input id="tankCapacity" type="number" value="120" />
+      <div id="settingsPage" class="tabPage activePage">
+        <h3>Settings</h3>
+        <div class="note">
+          This page is for defaults, constants, and your “how I run my truck” choices.
+        </div>
+
+        <button class="sectionBtn" type="button" onclick="toggleSection('settingsBusinessReserveSection')">
+          💼 Business Reserve (tap to open / close)
+        </button>
+
+        <div id="settingsBusinessReserveSection" class="sectionContent">
+          <div class="note">
+            This reserve protects the truck so your household doesn’t have to.<br/>
+            (Settings version = your default target rules, not Scenario math.)
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>Fuel Stop Minutes (input)</label>
-        <input id="fuelStopMinutes" type="number" value="15" />
-        <div class="note">Minimum 15 minutes per stop (MVP default)</div>
+      <div id="tripPage" class="tabPage">
+        <span class="badge">Locked constants: Avg Speed = 65 mph • DOT break = 30 min after 8 driving hours • Fuel stop min = 15 min</span>
+        <div class="divider"></div>
+
+        <h3>Trip (Data Entry)</h3>
+
+        <div class="grid">
+          <div>
+            <label>Deadhead Miles</label>
+            <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+          </div>
+
+          <div>
+            <label>Loaded Miles</label>
+            <input id="loadedMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+          </div>
+
+          <div>
+            <label>Return Miles</label>
+            <input id="returnMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+          </div>
+
+          <div>
+            <label>Total Miles (auto)</label>
+            <input id="totalMiles" type="number" readonly />
+            <div class="note">Deadhead + Loaded + Return</div>
+          </div>
+        </div>
+
+        <button class="sectionBtn" type="button" onclick="toggleSection('tripHelpSection')">
+          🧠 What this means (tap to open / close)
+        </button>
+        <div id="tripHelpSection" class="sectionContent">
+          <div class="note">
+            Trip miles drive: fuel use, time away, and what your true hourly value is (O.T.R.A.F.F).
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>Wait / Unload Time (hours) (input)</label>
-        <input id="waitHours" type="number" value="0" step="0.25" />
-        <div class="note">Counts as On-Duty time</div>
-      </div>
-<div>
-  <label>Revenue (input)</label>
-  <input id="revenue" type="number" value="0" step="0.01" />
-  <div class="note">Gross trip pay</div>
-</div>
-<div>
-  <label>Fuel Price ($/gal) (input)</label>
-  <input id="fuelPrice" type="number" value="0" step="0.01" />
-  <div class="note">Used to estimate fuel cost</div>
-</div>
-<div>
-  <label>Other Trip Costs (input)</label>
-  <input id="otherCosts" type="number" value="0" step="0.01" />
-  <div class="note">Tolls, lumper, etc. (optional)</div>
-</div>
-      <!-- RESERVES / WITHHOLDINGS (inputs) -->
+      <div id="scenarioPage" class="tabPage">
+        <h3>Scenario</h3>
+        <div class="note">Scenario = estimate only. Never writes to totals/history.</div>
 
-<div>
-  <label>Maintenance Reserve (%)</label>
-  <input id="reserveMaintPct" type="number" value="10" step="0.1" />
-  <div class="note">% of Net Revenue</div>
-</div>
-
-<div>
-  <label>Tax Reserve (%)</label>
-  <input id="reserveTaxPct" type="number" value="25" step="0.1" />
-  <div class="note">% of Net Revenue</div>
-</div>
-
-<div>
-  <label>Peace of Mind Reserve (%)</label>
-  <input id="reservePeacePct" type="number" value="5" step="0.1" />
-  <div class="note">% of Net Revenue</div>
-</div>
-
-<div>
-  <label>Household Withholding ($)</label>
-  <input id="householdWithhold" type="number" value="0" step="1" />
-  <div class="note">Optional fixed amount to pull off this trip</div>
-</div>
-      
-
-<!-- RESERVES / WITHHOLDINGS (outputs) -->
-<div>
-  <label>Maintenance Reserve ($)</label>
-  <input id="reserveMaint" type="number" readonly />
-  <div class="note">Net Revenue × Maintenance %</div>
-</div>
-
-<div>
-  <label>Tax Reserve ($)</label>
-  <input id="reserveTax" type="number" readonly />
-  <div class="note">Net Revenue × Tax %</div>
-</div>
-
-<div>
-  <label>Peace of Mind Reserve ($)</label>
-  <input id="reservePeace" type="number" readonly />
-  <div class="note">Net Revenue × Peace %</div>
-</div>
-
-<div>
-  <label>Total Withheld ($)</label>
-  <input id="totalWithheld" type="number" readonly />
-  <div class="note">Maintenance + Tax + Peace + Household</div>
-</div>
-8px
-<div>
-  <label>Take-Home After Withholds ($)</label>
-  <input id="takeHome" type="number" readonly />
-  <div class="note">Net Revenue − Total Withheld</div>
-</div>
-
-<div>
-  <label>O.T.R.A.F.F After Withholds ($/hr away)</label>
-  <input id="otrafTakeHome" type="number" readonly />
-  <div class="note">Take-Home ÷ Total Hours Away</div>
-</div>
-      <div>
-        <label>Status (read-only)</label>
-        <input id="status" type="text" readonly />
-        <div class="note">Tells you what’s missing</div>
-      </div>
-</div> <!-- CLOSES .grid -->
-    </div> <!-- closes tripSection -->
-      <!-- ============================= -->
-  <!-- =========================
-      <!-- INPUTS -->
-      <!-- =========================
-     Blueprint / DNA Buttons
-     Paste BELOW the grid </div>
-     and ABOVE the <script>
-========================== -->
-
-
-
-  
-
-  <h3>Business Budget (coming next)</h3>
-  <div class="note">
-    Trucks • Trailers • Insurance • Payments • Maintenance • Permits • IFTA • Business Reserve
-  </div>
-
-  <div class="divider"></div>
-
-  <h3>Family / Household (DNA)</h3>
-  <div class="note">
-    This is where Household Withholding becomes real life: groceries, bills, kids, stability, and the true cost of time away.
-  </div>
-</div>
-      <div>
- 
-Business Reserve (Scenario)
-Paste BELOW the </div><!-- closes .grid -->
-========================= -->
-
-<div class="divider"></div>
-
-<button class="sectionBtn" type="button" onclick="toggleSection('businessReserveSection')">
-  💼 Business Reserve (tap to open / close)
-</button>
-
-<div id="businessSection" class="sectionContent">
-  <h3>Business Reserve (Scenario)</h3>
-  <div class="note">
-    This is your trucking business budget: truck/trailer payments, insurance, maintenance, permits/IFTA, downtime, replacement planning.
-    These withholds come out of <b>Net Revenue</b> so you know what you really take home.
-  </div>
-
-  <div class="divider"></div>
-
-<h3>Business Reserve Inputs (Percent of Net Revenue)</h3>
-<div class="note">
-  Set your “withhold percentages” for the business side. These are taken from <b>Net Revenue</b> so you can plan payments and downtime.
-</div>
-
-<div class="grid">
-  <div>
-    <label>Truck Payment %</label>
-    <input id="bizTruckPayPct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Example: 18 = 18%</div>
-  </div>
-
-  <div>
-    <label>Trailer Payment %</label>
-    <input id="bizTrailerPayPct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Example: 6 = 6%</div>
-  </div>
-
-  <div>
-    <label>Insurance %</label>
-    <input id="bizInsurancePct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Weekly/monthly premium averaged out</div>
-  </div>
-
-  <div>
-    <label>Maintenance %</label>
-    <input id="bizMaintPct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Tires, oil, repairs, wear</div>
-  </div>
-
-  <div>
-    <label>Permits / IFTA %</label>
-    <input id="bizPermitsPct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Plates, permits, compliance</div>
-  </div>
-
-  <div>
-    <label>Downtime / Replacement %</label>
-    <input id="bizDowntimePct" type="number" value="0" oninput="runScenario()" />
-    <div class="note">Peace-of-mind buffer for breakdown weeks</div>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<h3>Business Reserve Outputs (Auto)</h3>
-<div class="grid">
-  <div>
-    <label>Truck Payment Reserve ($)</label>
-    <input id="bizTruckPayAmt" type="number" readonly />
-    <div class="note">Net Revenue × Truck %</div>
-  </div>
-
-  <div>
-    <label>Trailer Payment Reserve ($)</label>
-    <input id="bizTrailerPayAmt" type="number" readonly />
-    <div class="note">Net Revenue × Trailer %</div>
-  </div>
-
-  <div>
-    <label>Insurance Reserve ($)</label>
-    <input id="bizInsuranceAmt" type="number" readonly />
-    <div class="note">Net Revenue × Insurance %</div>
-  </div>
-
-  <div>
-    <label>Maintenance Reserve ($)</label>
-    <input id="bizMaintAmt" type="number" readonly />
-    <div class="note">Net Revenue × Maint %</div>
-  </div>
-
-  <div>
-    <label>Permits / IFTA Reserve ($)</label>
-    <input id="bizPermitsAmt" type="number" readonly />
-    <div class="note">Net Revenue × Permits %</div>
-  </div>
-
-  <div>
-    <label>Downtime Reserve ($)</label>
-    <input id="bizDowntimeAmt" type="number" readonly />
-    <div class="note">Net Revenue × Downtime %</div>
-  </div>
-
-  <div>
-    <label>Total Business Reserve ($)</label>
-    <input id="bizReserveTotal" type="number" readonly />
-    <div class="note">Sum of all business reserves</div>
-  </div>
-  </div> <!-- closes tripSection -->
-</div> <!-- closes tripPage -->
-<div id="scenarioPage" class="tabPage">
-
-  <div class="grid">
-    <!-- Percent inputs -->
-    <div>
-      <label>Truck Payment % (input)</label>
-      <input id="bizTruckPayPct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <div>
-      <label>Trailer Payment % (input)</label>
-      <input id="bizTrailerPayPct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <div>
-      <label>Insurance % (input)</label>
-      <input id="bizInsurancePct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <div>
-      <label>Maintenance % (input)</label>
-      <input id="bizMaintPct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <div>
-      <label>Permits / IFTA % (input)</label>
-      <input id="bizPermitsPct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <div>
-      <label>Downtime / Replacement % (input)</label>
-      <input id="bizDowntimePct" type="number" value="0" step="0.1" oninput="runScenario()" />
-    </div>
-
-    <!-- Dollar outputs -->
-    <div>
-      <label>Truck Payment Reserve ($)</label>
-      <input id="bizTruckPayAmt" type="number" readonly />
-      <div class="note">Net Revenue × Truck Payment %</div>
-    </div>
-
-    <div>
-      <label>Trailer Payment Reserve ($)</label>
-      <input id="bizTrailerPayAmt" type="number" readonly />
-      <div class="note">Net Revenue × Trailer Payment %</div>
-    </div>
-
-    <div>
-      <label>Insurance Reserve ($)</label>
-      <input id="bizInsuranceAmt" type="number" readonly />
-      <div class="note">Net Revenue × Insurance %</div>
-    </div>
-
-    <div>
-      <label>Maintenance Reserve ($)</label>
-      <input id="bizMaintAmt" type="number" readonly />
-      <div class="note">Net Revenue × Maintenance %</div>
-    </div>
-
-    <div>
-      <label>Permits / IFTA Reserve ($)</label>
-      <input id="bizPermitsAmt" type="number" readonly />
-      <div class="note">Net Revenue × Permits/IFTA %</div>
-    </div>
-
-    <div>
-      <label>Downtime / Replacement Reserve ($)</label>
-      <input id="bizDowntimeAmt" type="number" readonly />
-      <div class="note">Net Revenue × Downtime %</div>
-    </div>
-
-    <div>
-      <label>Total Business Withheld ($)</label>
-      <input id="bizTotalWithheld" type="number" readonly />
-      <div class="note">Sum of all business reserve buckets</div>
-    </div>
-  </div>
-</div>
-<!-- Blueprint / DNA Button -->
-<!-- ============================= -->
-
-<button class="sectionBtn" type="button" onclick="toggleSection('blueprintSection')">
-  📘 Blueprint (tap to open / close)
-</button>
-
-<div id="blueprintSection" class="sectionContent">
-  <div class="divider"></div>
-
-  <h3>Blueprint / DNA (Read-Only)</h3>
-  <div class="note">
-    This section explains the <b>why</b> behind the math.  
-    This is Trucking Made Simple DNA — education, not inputs.
-  </div>
-
-  <div class="divider"></div>
-
-  <h3>Business Budget (DNA)</h3>
-  <div class="note">
-    Trucks • Trailers • Payments • Insurance • Maintenance • Permits • IFTA •
-    Business Reserve • Downtime • Replacement Planning
-  </div>
-
-  <div class="divider"></div>
-
-  <h3>Family / Household (DNA)</h3>
-  <div class="note">
-    Household withholding represents real life: groceries, bills, kids,
-    stability, and protecting your family while you are O.T.R.A.F.F.
-  </div>
-</div>
-  </div> <!-- closes blueprintSection -->
-  
-  <button class="sectionBtn" type="button" onclick="toggleSection('scenarioSection')">
-  🎯 Scenario (tap to open / close)
-</button>
-<div id="scenarioSection" class="sectionContent open">
-  <!-- OUTPUTS -->
-      <div>
-        <label>Estimated Gallons Needed (read-only)</label>
-        <input id="gallonsNeeded" type="number" readonly />
-      </div>
-<div>
-  <label>Estimated Fuel Cost (read-only)</label>
-  <input id="fuelCost" type="number" readonly />
-  <div class="note">Estimated Gallons Needed × Fuel Price</div>
-</div>
-      <div>
-        <label>Fuel Stops (read-only)</label>
-        <input id="fuelStops" type="number" readonly />
-        <div class="note">ceil(gallons ÷ tank) − 1 (min 0)</div>
+        <button class="sectionBtn" type="button" onclick="toggleSection('scenarioReserveSection')">
+          🧰 Scenario Reserves (tap to open / close)
+        </button>
+        <div id="scenarioReserveSection" class="sectionContent">
+          <div class="note">Maintenance • Tax • Peace-of-Mind reserves calculated from Scenario.</div>
+        </div>
       </div>
 
-      <div>
-        <label>Fuel Stop Time (hours) (read-only)</label>
-        <input id="fuelStopHours" type="number" readonly />
-        <div class="note">fuelStops × minutes ÷ 60</div>
+      <div id="actualPage" class="tabPage">
+        <h3>Actual</h3>
+        <div class="note">Actual = truth. Only Actual updates totals/history.</div>
+
+        <button class="sectionBtn" type="button" onclick="toggleSection('actualReserveSection')">
+          ✅ Actual Reserves (tap to open / close)
+        </button>
+        <div id="actualReserveSection" class="sectionContent">
+          <div class="note">Actual reserve deductions come from what really happened.</div>
+        </div>
       </div>
 
-      <div>
-        <label>Driving Hours (read-only)</label>
-        <input id="drivingHours" type="number" readonly />
-        <div class="note">Total Miles ÷ 65 mph</div>
+      <div id="businessPage" class="tabPage">
+        <h3>Business</h3>
+        <div class="note">Truck & trailer payments • Insurance • Permits • Maintenance • Downtime</div>
+
+        <button class="sectionBtn" type="button" onclick="toggleSection('businessReserveSection')">
+          💼 Business Reserve (tap to open / close)
+        </button>
+        <div id="businessReserveSection" class="sectionContent">
+          <div class="note">
+            Business reserve section (Business page). This one is for business budgeting logic & education.
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>DOT Break (hours) (read-only)</label>
-        <input id="dotBreakHours" type="number" readonly />
-        <div class="note">0.5 hr if Driving Hours &gt; 8</div>
+      <div id="reservesPage" class="tabPage">
+        <h3>Reserves</h3>
+        <div class="note">Money set aside before take-home — on purpose.</div>
+
+        <button class="sectionBtn" type="button" onclick="toggleSection('reservesScenarioSection')">
+          🧰 Scenario Reserves (tap to open / close)
+        </button>
+        <div id="reservesScenarioSection" class="sectionContent">
+          <div class="note">Scenario reserve display and explanations.</div>
+        </div>
       </div>
 
-      <div>
-        <label>Duty Days (read-only)</label>
-        <input id="dutyDays" type="number" readonly />
-        <div class="note">ceil(Driving Hours ÷ 11)</div>
+      <div id="totalsPage" class="tabPage">
+        <h3>Totals</h3>
+        <div class="note">Monthly + YTD totals (Actual only).</div>
       </div>
 
-      <div>
-        <label>Reset Time (hours) (read-only)</label>
-        <input id="resetHours" type="number" readonly />
-        <div class="note">(Duty Days − 1) × 10</div>
+      <div id="dnaPage" class="tabPage">
+        <h3>Yearly DNA</h3>
+        <div class="note">Your yearly patterns, strengths, and money leaks.</div>
       </div>
 
-      <div>
-        <label>Total Hours Away (Scenario) (read-only)</label>
-        <input id="totalHoursAway" type="number" readonly />
-        <div class="note">Driving + DOT Break + Fuel Stop Time + Wait + Reset</div>
-      </div>
-    </div>
-<div>
-  <label>Net Revenue (Scenario) (read-only)</label>
-  <input id="netRevenue" type="number" readonly />
-  <div class="note">Revenue - Other Trip Costs (fuel not subtracted in this step)</div>
-</div>
-
-<div>
-  <label>$ / Mile (Scenario) (read-only)</label>
-  <input id="netPerMile" type="number" readonly />
-  <div class="note">Net Revenue ÷ Total Miles</div>
-</div>
-
-<div>
-  <label>O.T.R.A.F.F ($/hr away) (Scenario) (read-only)</label>
-  <input id="otraf" type="number" readonly />
-  <div class="note">Net Revenue ÷ Total Hours Away</div>
-</div>
-    <div class="row" style="margin-top:12px;">
-  <div>
-    <label>Mode</label>
-    <select id="mode" onchange="syncModeUI()">
-      <option value="scenario" selected>Scenario</option>
-      <option value="actual">Actual (locked until Delivered)</option>
-    </select>
-    <div class="note">Scenario is always available. Actual unlocks after Delivered.</div>
-  </div>
-
-  <div>
-    <label>Trip Status</label>
-    <select id="tripStatus" onchange="syncModeUI()">
-      <option value="planning" selected>Planning</option>
-      <option value="accepted">Accepted</option>
-      <option value="delivered">Delivered (unlocks Actual)</option>
-    </select>
-    <div class="note">Actual mode is read-only until Delivered.</div>
-  </div>
-</div>
-    <button onclick="runScenario()">Run Scenario</button>
-  </div> <!-- closes scenarioSection -->
-  </div>
-</div> <!-- closes scenarioPage -->
-<div id="actualPage" class="tabPage">
-
-  <span class="badge">
-    Actual Mode (Read-Only until Delivered)
-  </span>
-
-  <div class="divider"></div>
-
-  <!-- ACTUAL SECTION -->
-  <button class="sectionBtn" type="button" onclick="toggleSection('actualSection')">
-    📦 Actual Trip (tap to open / close)
-  </button>
-
-  <div id="actualSection" class="sectionContent">
-    <div class="grid">
-
-      <div>
-        <label>Actual Revenue ($)</label>
-        <input id="actualRevenue" type="number" readonly />
+      <div id="otraffPage" class="tabPage">
+        <h3>O.T.R.A.F.F</h3>
+        <div class="note">On The Road Away From Family — net revenue ÷ hours away.</div>
       </div>
 
-      <div>
-        <label>Actual Total Miles</label>
-        <input id="actualMiles" type="number" readonly />
+      <div id="plPage" class="tabPage">
+        <h3>Profit / Loss</h3>
+        <div class="note">P/L view (Actual only).</div>
       </div>
 
-      <div>
-        <label>Actual Hours Away</label>
-        <input id="actualHoursAway" type="number" readonly />
-      </div>
-
-      <div>
-        <label>O.T.R.A.F.F (Actual $/hr)</label>
-        <input id="actualOtraf" type="number" readonly />
-      </div>
+      <!-- ===================== TAB PAGES END ===================== -->
 
     </div>
   </div>
 
-</div> <!-- closes actualPage -->
+  <script>
+    // ---------- Helpers ----------
+    function n(id){
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const v = parseFloat(el.value);
+      return isFinite(v) ? v : 0;
+    }
+    function setVal(id, v){
+      const el = document.getElementById(id);
+      if (el) el.value = v;
+    }
 
-  
-    
+    // ---------- Section Toggle (open/close) ----------
+    function toggleSection(id){
+      const section = document.getElementById(id);
+      if (!section) return;
+      section.classList.toggle("open");
+    }
 
-<script>
-/* ===============================
-   Trucking Made Simple — Scenario Engine (Option B)
-   RULE: Scenario ALWAYS uses Lifetime MPG
-   =============================== */
+    // ---------- Tabs ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      const tabButtons = Array.from(document.querySelectorAll(".tabBtn"));
+      const tabPages   = Array.from(document.querySelectorAll(".tabPage"));
 
-const AVG_SPEED_MPH = 65;       // locked
-const DOT_BREAK_HOURS = 0.5;    // locked: 30 minutes
-const MAX_DRIVE_PER_DAY = 11;   // locked
-const RESET_HOURS = 10;         // locked
+      function setActiveTab(targetId){
+        tabButtons.forEach(b => b.classList.remove("active"));
+        tabPages.forEach(p => p.classList.remove("activePage"));
 
-function ceil(n) { return Math.ceil(n); }
-function round2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+        const btn = tabButtons.find(b => b.dataset.target === targetId);
+        const page = document.getElementById(targetId);
 
-function getEl(id) { return document.getElementById(id); }
-function num(id) {
-  const el = getEl(id);
-  if (!el) return NaN;
-  return Number(el.value);
-}
-function setVal(id, v) {
-  const el = getEl(id);
-  if (!el) return;
-  el.value = v;
-}
-function setFirst(ids, v) {
-  for (const id of ids) {
-    const el = getEl(id);
-    if (el) { el.value = v; return; }
-  }
-}
+        if (btn) btn.classList.add("active");
+        if (page) page.classList.add("activePage");
+      }
 
-/* Keeps UI rules: Actual locked until Delivered */
-function syncModelUI() {
-  const modeEl = getEl("mode");
-  const tripEl = getEl("tripStatus");
-  if (!modeEl || !tripEl) return;
+      tabButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const targetId = btn.dataset.target;
+          if (!targetId) return;
+          setActiveTab(targetId);
+          // optional: scroll to top of card on mobile
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }, { passive:false });
+      });
 
-  const mode = modeEl.value;
-  const trip = tripEl.value;
+      // Default tab (uses whichever button is marked .active first)
+      const defaultTarget =
+        document.querySelector(".tabBtn.active")?.dataset.target ||
+        tabButtons[0]?.dataset.target;
 
-  // lock actual until delivered
-  if (mode === "actual" && trip !== "delivered") {
-    modeEl.value = "scenario";
-    setVal("status", "Actual locked until Delivered");
-  } else {
-    // don’t overwrite status if it already shows validation text
-    const s = getEl("status");
-    if (s && !s.value) s.value = "OK";
-  }
-}
+      if (defaultTarget) setActiveTab(defaultTarget);
 
-/* Time engine */
-function calculateScenarioTime({ totalMiles, fuelStopTimeHours, waitUnloadHours }) {
-  const drivingHours = totalMiles / AVG_SPEED_MPH;
-  const dotBreakHours = drivingHours > 8 ? DOT_BREAK_HOURS : 0;
-
-  const dutyDays = ceil(drivingHours / MAX_DRIVE_PER_DAY);
-  const resetHours = Math.max((dutyDays - 1) * RESET_HOURS, 0);
-
-  const totalHoursAway =
-    drivingHours +
-    dotBreakHours +
-    (fuelStopTimeHours || 0) +
-    (waitUnloadHours || 0) +
-    resetHours;
-
-  const loadDaysConsumed = totalHoursAway / 24;
-
-  return {
-    drivingHours: round2(drivingHours),
-    dotBreakHours: round2(dotBreakHours),
-    dutyDays,
-    resetHours: round2(resetHours),
-    totalHoursAway: round2(totalHoursAway),
-    loadDaysConsumed: round2(loadDaysConsumed),
-    status: "OK"
-  };
-}
-
-function clearOutputs() {
-  setVal("status", "");
-  setFirst(["mpgUsed"], "");
-  setFirst(["estimatedGallons", "gallonsNeeded"], "");
-  setFirst(["fuelStops"], "");
-  setFirst(["fuelStopHours", "fuelStopTimeHours"], "");
-  setFirst(["drivingHours"], "");
-  setFirst(["dotBreakHours", "dotBreakHour"], "");
-  setFirst(["dutyDays"], "");
-  setFirst(["resetHours"], "");
-  setFirst(["totalHoursAway"], "");
-  
-  setFirst(["loadDaysConsumed"], "");
-  // keep scenarioMpg mirror consistent
-  setVal("scenarioMpg", "");
-}
-function updateTotalMilesFromParts() {
-  const deadhead = Number(document.getElementById("deadheadMiles")?.value || 0);
-  const loaded   = Number(document.getElementById("loadedMiles")?.value || 0);
-  const ret      = Number(document.getElementById("returnMiles")?.value || 0);
-
-  const total = deadhead + loaded + ret;
-
-  const totalEl = document.getElementById("totalMiles");
-  if (totalEl) totalEl.value = total;
-}
-
-  function runScenario() {
-  // read inputs
-  const totalMiles = num("totalMiles");
-  const lifetimeMpg = num("lifetimeMpg");
-  const tankCapacity = num("tankCapacity");
-  const fuelStopMinutes = num("fuelStopMinutes");
-  const waitHours = num("waitHours");
-
-  // basic validation
-  if (!isFinite(totalMiles) || totalMiles <= 0) {
-    setVal("status", "Enter Total Miles > 0");
-    clearOutputs();
-    return;
-  }
-  if (!isFinite(lifetimeMpg) || lifetimeMpg <= 0) {
-    setVal("status", "Lifetime MPG must be > 0");
-    clearOutputs();
-    return;
-  }
-  if (!isFinite(tankCapacity) || tankCapacity <= 0) {
-    setVal("status", "Tank Capacity must be > 0");
-    clearOutputs();
-    return;
-  }
-  if (!isFinite(fuelStopMinutes) || fuelStopMinutes <= 0) {
-    setVal("status", "Fuel Stop Minutes must be > 0");
-    clearOutputs();
-    return;
-  }
-  if (!isFinite(waitHours) || waitHours < 0) {
-    setVal("status", "Wait/Unload must be 0 or more");
-    clearOutputs();
-    return;
-  }
-
-  // OPTION B: LOCKED MPG
-  const mpgUsed = lifetimeMpg;
-
-  // mirror scenario MPG display (read-only)
-  setVal("scenarioMpg", mpgUsed.toFixed(2));
-  setFirst(["mpgUsed"], mpgUsed.toFixed(2));
-
-  // fuel math
-  const gallonsNeeded = totalMiles / mpgUsed;
-  const fuelStops = Math.max(ceil(gallonsNeeded / tankCapacity) - 1, 0);
-  const fuelStopTimeHours = (fuelStops * fuelStopMinutes) / 60;
-
-  setFirst(["estimatedGallons", "gallonsNeeded"], gallonsNeeded.toFixed(2));
-  // fuel cost math
-const fuelPrice = num("fuelPrice");
-const fuelCost = gallonsNeeded * fuelPrice;
-setVal("fuelCost", isFinite(fuelCost) ? fuelCost.toFixed(2) : "");
-    setFirst(["fuelStops"], String(fuelStops));
-  setFirst(["fuelStopHours", "fuelStopTimeHours"], fuelStopTimeHours.toFixed(2));
-
-  // time math
-  const time = calculateScenarioTime({
-    totalMiles,
-    fuelStopTimeHours,
-    waitUnloadHours: waitHours
-  });
-
-  setFirst(["drivingHours"], time.drivingHours.toFixed(2));
-  setFirst(["dotBreakHours"], time.dotBreakHours.toFixed(2));
-  setFirst(["dutyDays"], String(time.dutyDays));
-  setFirst(["resetHours"], time.resetHours.toFixed(2));
-  setFirst(["totalHoursAway"], time.totalHoursAway.toFixed(2));
-// --- Revenue + Fuel + Costs + O.T.R.A.F.F (Scenario) ---
-const revenue = num("revenue");
-const otherCosts = num("otherCosts");
-
-// fuel cost (already computed above in your code)
-// const fuelCost = ... (keep your fuelCost math above)
-
-// Net Revenue = Revenue - Fuel Cost - Other Trip Costs
-const netRevenue = revenue - fuelCost - otherCosts;
-setVal("netRevenue", isFinite(netRevenue) ? netRevenue.toFixed(2) : "");
-
-// --- BUSINESS RESERVE (Scenario) ---
-const bizTruckPayPct = num("bizTruckPayPct") / 100;
-const bizTrailerPayPct = num("bizTrailerPayPct") / 100;
-const bizInsurancePct = num("bizInsurancePct") / 100;
-const bizMaintPct = num("bizMaintPct") / 100;
-const bizPermitsPct = num("bizPermitsPct") / 100;
-const bizDowntimePct = num("bizDowntimePct") / 100;
-
-const bizTruckPayAmt = netRevenue * bizTruckPayPct;
-const bizTrailerPayAmt = netRevenue * bizTrailerPayPct;
-const bizInsuranceAmt = netRevenue * bizInsurancePct;
-const bizMaintAmt = netRevenue * bizMaintPct;
-const bizPermitsAmt = netRevenue * bizPermitsPct;
-const bizDowntimeAmt = netRevenue * bizDowntimePct;
-
-// Write Business Reserve outputs to the screen
-setVal("bizTruckPayAmt", isFinite(bizTruckPayAmt) ? bizTruckPayAmt.toFixed(2) : "");
-setVal("bizTrailerPayAmt", isFinite(bizTrailerPayAmt) ? bizTrailerPayAmt.toFixed(2) : "");
-setVal("bizInsuranceAmt", isFinite(bizInsuranceAmt) ? bizInsuranceAmt.toFixed(2) : "");
-setVal("bizMaintAmt", isFinite(bizMaintAmt) ? bizMaintAmt.toFixed(2) : "");
-setVal("bizPermitsAmt", isFinite(bizPermitsAmt) ? bizPermitsAmt.toFixed(2) : "");
-setVal("bizDowntimeAmt", isFinite(bizDowntimeAmt) ? bizDowntimeAmt.toFixed(2) : "");
-
-const bizReserveTotal =
-  bizTruckPayAmt + bizTrailerPayAmt + bizInsuranceAmt + bizMaintAmt + bizPermitsAmt + bizDowntimeAmt;
-
-setVal("bizReserveTotal", isFinite(bizReserveTotal) ? bizReserveTotal.toFixed(2) : "");
-
-const bizTotalWithheld =
-  bizTruckPayAmt + bizTrailerPayAmt + bizInsuranceAmt + bizMaintAmt + bizPermitsAmt + bizDowntimeAmt;
-
-setVal("bizTotalWithheld", isFinite(bizTotalWithheld) ? bizTotalWithheld.toFixed(2) : "");
-
-// $/mile = Net Revenue ÷ Total Miles
-const netPerMile = netRevenue / totalMiles;
-setVal("netPerMile", isFinite(netPerMile) ? netPerMile.toFixed(2) : "");
-
-// O.T.R.A.F.F = Net Revenue ÷ Total Hours Away
-const otraf = netRevenue / time.totalHoursAway;
-setVal("otraf", isFinite(otraf) ? otraf.toFixed(2) : "");
-
-// --- RESERVES / WITHHOLDS (Scenario) ---
-const reserveMaintPct = num("reserveMaintPct") / 100;
-const reserveTaxPct   = num("reserveTaxPct") / 100;
-const reservePeacePct = num("reservePeacePct") / 100;
-
-// Household fixed withholding (optional)
-const householdWithhold = num("householdWithhold");
-// Reserve $ amounts (based on Net Revenue)
-const reserveMaint = netRevenue * reserveMaintPct;
-const reserveTax   = netRevenue * reserveTaxPct;
-const reservePeace = netRevenue * reservePeacePct;
-
-setVal("reserveMaint", isFinite(reserveMaint) ? reserveMaint.toFixed(2) : "");
-setVal("reserveTax",   isFinite(reserveTax) ? reserveTax.toFixed(2) : "");
-setVal("reservePeace", isFinite(reservePeace) ? reservePeace.toFixed(2) : "");
-
-// Total withheld = reserves + household withholding
-const totalWithheld = reserveMaint + reserveTax + reservePeace + householdWithhold;
-setVal("totalWithheld", isFinite(totalWithheld) ? totalWithheld.toFixed(2) : "");
-
-// Take-home after withholds
-const takeHome = netRevenue - totalWithheld;
-setVal("takeHome", isFinite(takeHome) ? takeHome.toFixed(2) : "");
-
-// O.T.R.A.F.F after withholds = Take-home ÷ Total Hours Away
-const otrafTakeHome = takeHome / time.totalHoursAway;
-setVal("otrafTakeHome", isFinite(otrafTakeHome) ? otrafTakeHome.toFixed(2) : "");
-
-// keep your existing status behavior
-if (time.status === "OK") setVal("status", "OK");
-    
-}
-// ===============================
-// Blueprint / DNA Section Toggle
-// ===============================
-<script>
-// ==============================
-// Section Toggle (open / close)
-// ==============================
-function toggleSection(id) {
-  const section = document.getElementById(id);
-  if (!section) return;
-  section.classList.toggle("open");
-}
-
-// ==============================
-// Top Tabs (Settings / Trip / Scenario / Actual / etc.)
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  const tabButtons = document.querySelectorAll(".tabBtn");
-  const tabPages = document.querySelectorAll(".tabPage");
-
-  function setActiveTab(targetId) {
-    tabButtons.forEach(btn => btn.classList.remove("active"));
-    tabPages.forEach(page => page.classList.remove("activePage"));
-
-    const activeBtn = document.querySelector(`[data-target="${targetId}"]`);
-    const activePage = document.getElementById(targetId);
-
-    if (activeBtn) activeBtn.classList.add("active");
-    if (activePage) activePage.classList.add("activePage");
-  }
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      setActiveTab(btn.dataset.target);
+      // initialize miles
+      updateTotalMilesFromParts();
     });
-  });
 
-  // Default tab on load
-  setActiveTab("settingsPage");
-});
-</script>
-
-
-      // hide all pages
-      document.querySelectorAll(".tabPage").forEach(p =>
-        p.classList.remove("activePage")
-      );
-
-      // show target page
-      const page = document.getElementById(target);
-      if (page) page.classList.add("activePage");
-
-      // highlight active tab
-      tabs.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-    });
-  });
+    // ---------- Example Trip calc ----------
+    function updateTotalMilesFromParts(){
+      const total = n("deadheadMiles") + n("loadedMiles") + n("returnMiles");
+      setVal("totalMiles", total);
+    }
   </script>
-  </body>
+
+</body>
 </html>
