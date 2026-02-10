@@ -206,6 +206,25 @@
   pointer-events: auto !important;
  }
   </style>
+/* ===== Section toggle behavior ===== */
+.sectionContent {
+  display: none;
+}
+
+.sectionContent.open {
+  display: block;
+}
+
+/* Ensure buttons are clickable */
+.sectionBtn {
+  position: relative;
+  z-index: 2;
+}
+
+.sectionContent {
+  position: relative;
+  z-index: 1;
+}
 </head>
 
 
