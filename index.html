@@ -238,19 +238,44 @@
   </div>
   <div class="headerDivider"></div>
 </div>
-    <!-- ================= TAB PAGES START ================= -->
+
+<!-- ================= TAB PAGES START ================= -->
 
 <div id="settingsPage" class="tabPage">
   <h3>Settings</h3>
 </div>
 
 <div id="scenarioPage" class="tabPage">
-  <!-- 🔽 SCENARIO INPUTS GO HERE -->
-</div>
+  <div class="grid">
+
+    <div>
+      <label>Deadhead Miles (input)</label>
+      <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+    </div>
+
+    <div>
+      <label>Loaded Miles (input)</label>
+      <input id="loadedMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+    </div>
+
+    <div>
+      <label>Return Miles (input)</label>
+      <input id="returnMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
+    </div>
+
+    <div>
+      <label>Total Miles (auto)</label>
+      <input id="totalMiles" type="number" readonly />
+      <div class="note">Deadhead + Loaded + Return</div>
+    </div>
+
+  </div>
+</div> <!-- closes scenarioPage -->
 
 <div id="actualPage" class="tabPage">
-  <!-- 🔽 ACTUAL INPUTS GO HERE -->
+  <!-- ACTUAL INPUTS GO HERE (kept separate on purpose) -->
 </div>
+
 
 <!-- ================= TAB PAGES CONTINUE ================= -->
     <div id="tripPage" class="tabPage activePage">
@@ -265,28 +290,7 @@
 </button>
 <div id="tripSection" class="sectionContent open">
   
-<div id="scenarioPage" class="tabPage">
 
-    <div class="grid">
-    <div> <label>Deadhead Miles (input)</label>
-  <input id="deadheadMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-</div>
-
-<div>
-  <label>Loaded Miles (input)</label>
-  <input id="loadedMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-</div>
-
-<div>
-  <label>Return Miles (input)</label>
-  <input id="returnMiles" type="number" value="0" oninput="updateTotalMilesFromParts()" />
-</div>
-
-<div>
-  <label>Total Miles (auto)</label>
-  <input id="totalMiles" type="number" readonly />
-  <div class="note">Deadhead + Loaded + Return</div>
-</div>
 
       <div>
         <label>Lifetime Avg MPG (read-only)</label>
