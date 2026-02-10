@@ -195,8 +195,19 @@
   background:#fff;
   color:#111;
 }
+ /* SAFETY OVERRIDE: allow typing in Scenario inputs */
+#secScenario input,
+#secScenario select,
+#secScenario textarea {
+  pointer-events: auto !important;
+  user-select: auto !important;
+}
+ #secScenario input[readonly]{
+  pointer-events: auto !important;
+ }
   </style>
 </head>
+
 
 <body>
    <!-- TOP SCROLL BAR (YouTube-style tabs) -->
