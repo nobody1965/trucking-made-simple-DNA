@@ -275,7 +275,43 @@
 <div id="actualPage" class="tabPage">
   <!-- ACTUAL INPUTS GO HERE (kept separate on purpose) -->
 </div>
+<!-- ================= BUSINESS & RESERVES PAGES ================= -->
 
+<div id="businessPage" class="tabPage">
+  <h3>Business</h3>
+  <div class="note">
+    Truck & trailer payments • Insurance • Permits • Maintenance • Downtime
+  </div>
+
+  <button class="sectionBtn" type="button" onclick="toggleSection('businessReserveSection')">
+    💼 Business Reserve (tap to open / close)
+  </button>
+
+  <div id="businessReserveSection" class="sectionContent">
+    <div class="note">
+      This reserve protects the truck so your household doesn’t have to.
+    </div>
+  </div>
+</div>
+
+<div id="reservesPage" class="tabPage">
+  <h3>Reserves</h3>
+  <div class="note">
+    Money set aside before take-home — on purpose.
+  </div>
+
+  <button class="sectionBtn" type="button" onclick="toggleSection('scenarioReserveSection')">
+    🧠 Scenario Reserves (tap to open / close)
+  </button>
+
+  <div id="scenarioReserveSection" class="sectionContent">
+    <div class="note">
+      Maintenance • Tax • Peace-of-Mind reserves calculated from Scenario.
+    </div>
+  </div>
+</div>
+
+<!-- ================= END BUSINESS & RESERVES PAGES ================= -->
 
 <!-- ================= TAB PAGES CONTINUE ================= -->
     <div id="tripPage" class="tabPage activePage">
