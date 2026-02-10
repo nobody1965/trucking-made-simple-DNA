@@ -148,6 +148,7 @@
     <button class="tabBtn" data-target="tripPage">Trip</button>
     <button class="tabBtn" data-target="scenarioPage">Scenario</button>
     <button class="tabBtn" data-target="actualPage">Actual</button>
+    <button class="tabBtn" data-target="budgetPage">Budget</button>
     <button class="tabBtn" data-target="reservesPage">Reserves</button>
     <button class="tabBtn" data-target="totalsPage">Totals</button>
     <button class="tabBtn" data-target="dnaPage">Yearly DNA</button>
@@ -537,6 +538,209 @@
   <div id="actualReserveSection" class="sectionContent">
     <div class="note">Actual reserve deductions come from what really happened.</div>
   </div>
+</div>
+
+<div id="budgetPage" class="tabPage">
+  <h3>Budget</h3>
+
+  <div class="note">
+    🔒 Budget = two ledgers inside one tab.<br>
+    🏠 Household protects life. 🚛 Business protects the truck.<br>
+    Values here are stored as budgets only — they do not rewrite Scenario/Actual truth.
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ===================== HOUSEHOLD ===================== -->
+  <button class="sectionBtn" type="button" onclick="toggleSection('budgetHouseholdSection')">
+    🏠 Household Budget (tap to open / close)
+  </button>
+
+  <div id="budgetHouseholdSection" class="sectionContent">
+    <div class="note">
+      Household = what the family needs monthly even if the truck makes $0 this week.
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Housing ($/mo)</label>
+        <input id="hhHousing" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Utilities ($/mo)</label>
+        <input id="hhUtilities" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Food ($/mo)</label>
+        <input id="hhFood" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Household Insurance ($/mo)</label>
+        <input id="hhInsurance" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Phone / Internet ($/mo)</label>
+        <input id="hhPhoneInternet" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Family / Child Support ($/mo)</label>
+        <input id="hhChildSupport" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Household Transportation ($/mo)</label>
+        <input id="hhTransport" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Household Buffer ($/mo)</label>
+        <input id="hhBuffer" type="number" placeholder="0" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid">
+      <div>
+        <label>Household Total ($/mo) (auto)</label>
+        <input id="hhTotalMonthly" readonly />
+      </div>
+
+      <div>
+        <label>Household Total ($/wk) (auto)</label>
+        <input id="hhTotalWeekly" readonly />
+      </div>
+
+      <div>
+        <label>Household Total ($/day) (auto)</label>
+        <input id="hhTotalDaily" readonly />
+      </div>
+
+      <div>
+        <label>Household Total ($/hr away) (auto)</label>
+        <input id="hhTotalHourlyAway" readonly />
+        <div class="note">Uses 24 hrs/day for a simple v1.0 baseline.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="sectionBtn" type="button" onclick="saveBudgetPlainLock()">
+      💾 Save Budget (Household + Business)
+    </button>
+
+    <button class="sectionBtn" type="button" onclick="resetBudgetPlainLock()">
+      ♻️ Reset Budget
+    </button>
+
+    <div id="budgetSavedMsg" class="note" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- ===================== BUSINESS ===================== -->
+  <button class="sectionBtn" type="button" onclick="toggleSection('budgetBusinessSection')">
+    🚛 Business Budget (tap to open / close)
+  </button>
+
+  <div id="budgetBusinessSection" class="sectionContent">
+    <div class="note">
+      Business = fixed monthly costs + buffers that exist even if the truck is parked.
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Truck Payment ($/mo)</label>
+        <input id="bizTruckPayment" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Truck Insurance ($/mo)</label>
+        <input id="bizInsurance" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Plates / Permits ($/mo)</label>
+        <input id="bizPlatesPermits" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>ELD / Subscriptions ($/mo)</label>
+        <input id="bizEldSubs" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Accounting / Admin ($/mo)</label>
+        <input id="bizAdmin" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Maintenance Reserve ($/mo)</label>
+        <input id="bizMaintenanceReserve" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Tire Reserve ($/mo)</label>
+        <input id="bizTireReserve" type="number" placeholder="0" />
+      </div>
+
+      <div>
+        <label>Breakdown Buffer ($/mo)</label>
+        <input id="bizBreakdownBuffer" type="number" placeholder="0" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid">
+      <div>
+        <label>Business Total ($/mo) (auto)</label>
+        <input id="bizTotalMonthly" readonly />
+      </div>
+
+      <div>
+        <label>Business Total ($/wk) (auto)</label>
+        <input id="bizTotalWeekly" readonly />
+      </div>
+
+      <div>
+        <label>Business Total ($/day) (auto)</label>
+        <input id="bizTotalDaily" readonly />
+      </div>
+
+      <div>
+        <label>Business Total ($/hr away) (auto)</label>
+        <input id="bizTotalHourlyAway" readonly />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid">
+      <div>
+        <label>Combined Total ($/mo) (auto)</label>
+        <input id="budgetCombinedMonthly" readonly />
+      </div>
+
+      <div>
+        <label>Combined Total ($/hr away) (auto)</label>
+        <input id="budgetCombinedHourlyAway" readonly />
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STORAGE NOTE ===================== -->
+  <!--
+    PC-BUDGET-DUAL-LEDGER v1.0 (storage)
+    storageKey: TMS_BUDGET_v1
+    Household fields: hh*
+    Business fields: biz*
+    Rule: Budget stores values + derived rollups only.
+    It does NOT write to Scenario/Actual truth directly in v1.0.
+  -->
 </div>
 
       <div id="totalsPage" class="tabPage">
@@ -930,6 +1134,162 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       // Save Trip entries without touching Scenario/Actual math
       saveTripPlainLock();
+    });
+  });
+});
+
+// =====================
+// 🔒 PLAIN LOCK BUDGET v1.0 (DUAL LEDGER)
+// =====================
+const TMS_BUDGET_STORAGE_KEY = "TMS_BUDGET_v1";
+
+const TMS_BUDGET_DEFAULTS = {
+  // Household
+  hhHousing: 0,
+  hhUtilities: 0,
+  hhFood: 0,
+  hhInsurance: 0,
+  hhPhoneInternet: 0,
+  hhChildSupport: 0,
+  hhTransport: 0,
+  hhBuffer: 0,
+
+  // Business
+  bizTruckPayment: 0,
+  bizInsurance: 0,
+  bizPlatesPermits: 0,
+  bizEldSubs: 0,
+  bizAdmin: 0,
+  bizMaintenanceReserve: 0,
+  bizTireReserve: 0,
+  bizBreakdownBuffer: 0
+};
+
+function numVal(id){
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  const v = Number(el.value);
+  return isFinite(v) ? Math.max(0, v) : 0;
+}
+
+function setRO(id, v){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = isFinite(v) ? v.toFixed(2) : "";
+}
+
+function getBudgetEls(){
+  const ids = Object.keys(TMS_BUDGET_DEFAULTS);
+  const map = {};
+  ids.forEach(id => map[id] = document.getElementById(id));
+  return map;
+}
+
+function readBudgetFromUI(){
+  const data = {};
+  Object.keys(TMS_BUDGET_DEFAULTS).forEach(id => {
+    data[id] = numVal(id);
+  });
+  return data;
+}
+
+function writeBudgetToUI(b){
+  Object.keys(TMS_BUDGET_DEFAULTS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (b[id] ?? 0);
+  });
+}
+
+function calcBudgetRollups(b){
+  const hhMonthly =
+    (b.hhHousing + b.hhUtilities + b.hhFood + b.hhInsurance +
+     b.hhPhoneInternet + b.hhChildSupport + b.hhTransport + b.hhBuffer);
+
+  const bizMonthly =
+    (b.bizTruckPayment + b.bizInsurance + b.bizPlatesPermits + b.bizEldSubs +
+     b.bizAdmin + b.bizMaintenanceReserve + b.bizTireReserve + b.bizBreakdownBuffer);
+
+  const hhWeekly = hhMonthly / 4.333;  // avg weeks per month
+  const bizWeekly = bizMonthly / 4.333;
+
+  const hhDaily = hhMonthly / 30.0;    // simple v1.0 baseline
+  const bizDaily = bizMonthly / 30.0;
+
+  const hhHourlyAway = hhDaily / 24.0; // per hour away from home
+  const bizHourlyAway = bizDaily / 24.0;
+
+  const combinedMonthly = hhMonthly + bizMonthly;
+  const combinedHourlyAway = hhHourlyAway + bizHourlyAway;
+
+  return {
+    hhMonthly, hhWeekly, hhDaily, hhHourlyAway,
+    bizMonthly, bizWeekly, bizDaily, bizHourlyAway,
+    combinedMonthly, combinedHourlyAway
+  };
+}
+
+function renderBudgetRollups(){
+  const b = readBudgetFromUI();
+  const r = calcBudgetRollups(b);
+
+  setRO("hhTotalMonthly", r.hhMonthly);
+  setRO("hhTotalWeekly", r.hhWeekly);
+  setRO("hhTotalDaily", r.hhDaily);
+  setRO("hhTotalHourlyAway", r.hhHourlyAway);
+
+  setRO("bizTotalMonthly", r.bizMonthly);
+  setRO("bizTotalWeekly", r.bizWeekly);
+  setRO("bizTotalDaily", r.bizDaily);
+  setRO("bizTotalHourlyAway", r.bizHourlyAway);
+
+  setRO("budgetCombinedMonthly", r.combinedMonthly);
+  setRO("budgetCombinedHourlyAway", r.combinedHourlyAway);
+}
+
+function loadBudgetPlainLock(){
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(TMS_BUDGET_STORAGE_KEY) || "null");
+  } catch (e) {
+    saved = null;
+  }
+
+  const b = { ...TMS_BUDGET_DEFAULTS, ...(saved || {}) };
+
+  // clamp to >= 0
+  Object.keys(b).forEach(k => {
+    const v = Number(b[k]);
+    b[k] = isFinite(v) ? Math.max(0, v) : 0;
+  });
+
+  writeBudgetToUI(b);
+  renderBudgetRollups();
+}
+
+function saveBudgetPlainLock(){
+  const msgEl = document.getElementById("budgetSavedMsg");
+  const b = readBudgetFromUI();
+  localStorage.setItem(TMS_BUDGET_STORAGE_KEY, JSON.stringify(b));
+  renderBudgetRollups();
+  if (msgEl) msgEl.textContent = "✅ Saved Budget (Household + Business).";
+}
+
+function resetBudgetPlainLock(){
+  const msgEl = document.getElementById("budgetSavedMsg");
+  localStorage.setItem(TMS_BUDGET_STORAGE_KEY, JSON.stringify(TMS_BUDGET_DEFAULTS));
+  loadBudgetPlainLock();
+  if (msgEl) msgEl.textContent = "♻️ Reset Budget to defaults.";
+}
+
+// Live rollups as you type
+document.addEventListener("DOMContentLoaded", () => {
+  loadBudgetPlainLock();
+
+  Object.keys(TMS_BUDGET_DEFAULTS).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      renderBudgetRollups();
     });
   });
 });
