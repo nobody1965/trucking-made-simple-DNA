@@ -346,38 +346,50 @@
       section.classList.toggle("open");
     }
 
-    // ---------- Tabs ----------
-    document.addEventListener("DOMContentLoaded", () => {
-      const tabButtons = Array.from(document.querySelectorAll(".tabBtn"));
-      const tabPages   = Array.from(document.querySelectorAll(".tabPage"));
+// ---------- Tabs ----------
+document.addEventListener("DOMContentLoaded", () => {
+  const tabButtons = Array.from(document.querySelectorAll(".tabBtn"));
+  const tabPages   = Array.from(document.querySelectorAll(".tabPage"));
 
-function setActiveTab(targetId){
-  tabButtons.forEach(b => b.classList.remove("active"));
-  tabPages.forEach(p => p.classList.remove("activePage"));
+  function setActiveTab(targetId){
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabPages.forEach(p => p.classList.remove("activePage"));
 
-  const btn  = tabButtons.find(b => b.dataset.target === targetId);
-  const page = document.getElementById(targetId);
+    const btn  = tabButtons.find(b => b.dataset.target === targetId);
+    const page = document.getElementById(targetId);
 
-  if (btn)  btn.classList.add("active");
-  if (page) page.classList.add("activePage");
+    if (btn)  btn.classList.add("active");
+    if (page) page.classList.add("activePage");
 
-  // 🔒 AUTO-RUN SCENARIO WHEN SCENARIO TAB BECOMES ACTIVE
-  if (targetId === "scenarioPage"){
-    runScenario();
+    // 🔒 AUTO-RUN SCENARIO WHEN SCENARIO TAB BECOMES ACTIVE
+    if (targetId === "scenarioPage"){
+      runScenario();
+    }
   }
-]
 
-      // Default tab (uses whichever button is marked .active first)
-      const defaultTarget =
-        document.querySelector(".tabBtn.active")?.dataset.target ||
-        tabButtons[0]?.dataset.target;
+  // 🔗 CLICK HANDLERS (THIS IS WHAT MAKES TABS CLICKABLE)
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetId = btn.dataset.target;
+      if (!targetId) return;
+      setActiveTab(targetId);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, { passive:false });
+  });
 
-      if (defaultTarget) setActiveTab(defaultTarget);
+  // Default tab (uses whichever button is marked .active first)
+  const defaultTarget =
+    document.querySelector(".tabBtn.active")?.dataset.target ||
+    tabButtons[0]?.dataset.target;
 
-      // initialize miles
-      updateTotalMilesFromParts();
-    });
+  if (defaultTarget) setActiveTab(defaultTarget);
 
+  // initialize miles
+  updateTotalMilesFromParts();
+});
+    
     // ---------- Example Trip calc ----------
     function updateTotalMilesFromParts(){
       const total = n("deadheadMiles") + n("loadedMiles") + n("returnMiles");
