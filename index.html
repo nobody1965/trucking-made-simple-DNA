@@ -227,6 +227,34 @@
         <h3>Scenario</h3>
         <div class="note">Scenario = estimate only. Never writes to totals/history.</div>
 
+<div id="scenarioOutput" class="sectionContent open">
+  <div class="note" id="scenarioMessage">
+    Scenario will auto-calculate when opened.
+  </div>
+
+  <div class="grid">
+    <div>
+      <label>Scenario Net ($)</label>
+      <input id="scenNet" readonly />
+    </div>
+
+    <div>
+      <label>Cost Per Mile ($)</label>
+      <input id="scenCPM" readonly />
+    </div>
+
+    <div>
+      <label>Hours Away</label>
+      <input id="scenHours" readonly />
+    </div>
+
+    <div>
+      <label>O.T.R.A.F.F ($/hr)</label>
+      <input id="scenOTRAFF" readonly />
+    </div>
+  </div>
+</div>
+
         <button class="sectionBtn" type="button" onclick="toggleSection('scenarioReserveSection')">
           🧰 Scenario Reserves (tap to open / close)
         </button>
@@ -323,28 +351,21 @@
       const tabButtons = Array.from(document.querySelectorAll(".tabBtn"));
       const tabPages   = Array.from(document.querySelectorAll(".tabPage"));
 
-      function setActiveTab(targetId){
-        tabButtons.forEach(b => b.classList.remove("active"));
-        tabPages.forEach(p => p.classList.remove("activePage"));
+function setActiveTab(targetId){
+  tabButtons.forEach(b => b.classList.remove("active"));
+  tabPages.forEach(p => p.classList.remove("activePage"));
 
-        const btn = tabButtons.find(b => b.dataset.target === targetId);
-        const page = document.getElementById(targetId);
+  const btn  = tabButtons.find(b => b.dataset.target === targetId);
+  const page = document.getElementById(targetId);
 
-        if (btn) btn.classList.add("active");
-        if (page) page.classList.add("activePage");
-      }
+  if (btn)  btn.classList.add("active");
+  if (page) page.classList.add("activePage");
 
-      tabButtons.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const targetId = btn.dataset.target;
-          if (!targetId) return;
-          setActiveTab(targetId);
-          // optional: scroll to top of card on mobile
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }, { passive:false });
-      });
+  // 🔒 AUTO-RUN SCENARIO WHEN SCENARIO TAB BECOMES ACTIVE
+  if (targetId === "scenarioPage"){
+    runScenario();
+  }
+]
 
       // Default tab (uses whichever button is marked .active first)
       const defaultTarget =
@@ -362,6 +383,52 @@
       const total = n("deadheadMiles") + n("loadedMiles") + n("returnMiles");
       setVal("totalMiles", total);
     }
+
+const SCENARIO_LOCK = {
+  avgSpeed: 65,           // mph
+  fuelCostPerMile: 0.75,  // placeholder avg
+  reserveRate: 0.18,      // 18% total reserves
+  fuelStopMinutes: 15,
+  dotBreakHours: 8
+};
+
+function runScenario(){
+  const miles = n("totalMiles");
+  const revenue = 0; // placeholder until rate input exists
+
+  if (miles <= 0){
+    document.getElementById("scenarioMessage").textContent =
+      "Enter trip miles to view Scenario.";
+    clearScenarioOutputs();
+    return;
+  }
+
+  // --- Time calculation ---
+  const driveHours = miles / SCENARIO_LOCK.avgSpeed;
+  const dotBreaks = Math.floor(driveHours / SCENARIO_LOCK.dotBreakHours) * 0.5;
+  const fuelStops = Math.max(1, Math.floor(miles / 500)) * (SCENARIO_LOCK.fuelStopMinutes / 60);
+  const totalHours = driveHours + dotBreaks + fuelStops;
+
+  // --- Cost calculation ---
+  const tripCost = miles * SCENARIO_LOCK.fuelCostPerMile;
+  const reserves = tripCost * SCENARIO_LOCK.reserveRate;
+  const net = revenue - tripCost - reserves;
+  const cpm = (tripCost + reserves) / miles;
+  const otraff = totalHours > 0 ? net / totalHours : 0;
+
+  // --- Render ---
+  setVal("scenNet", net.toFixed(2));
+  setVal("scenCPM", cpm.toFixed(2));
+  setVal("scenHours", totalHours.toFixed(2));
+  setVal("scenOTRAFF", otraff.toFixed(2));
+
+  document.getElementById("scenarioMessage").textContent =
+    "Scenario calculated automatically (estimate only).";
+}
+
+function clearScenarioOutputs(){
+  ["scenNet","scenCPM","scenHours","scenOTRAFF"].forEach(id => setVal(id,""));
+}
   </script>
 
 </body>
