@@ -311,6 +311,18 @@
             <label>Total Miles (auto)</label>
             <input id="totalMiles" type="number" readonly />
             <div class="note">Deadhead + Loaded + Return</div>
+
+            <div class="divider"></div>
+
+          <button class="sectionBtn" type="button" onclick="saveTripPlainLock()">
+          💾 Save Trip Miles (Data Entry Only)
+          </button>
+
+          <button class="sectionBtn" type="button" onclick="resetTripPlainLock()">
+          ♻️ Reset Trip Miles
+          </button>
+
+          <div id="tripSavedMsg" class="note" style="margin-top:8px;"></div>
           </div>
         </div>
 
@@ -696,6 +708,145 @@ function resetSettingsPlainLock(){
 // Load settings at startup (does not touch Scenario/Actual math)
 document.addEventListener("DOMContentLoaded", () => {
   loadSettingsPlainLock();
+});
+
+// =====================
+// 🔒 PLAIN LOCK TRIP v1.0 (DATA ENTRY ONLY)
+// =====================
+// Trip page is for miles entry + education only.
+// It does NOT change Scenario/Actual formulas by itself.
+// It may store and recall trip miles between sessions.
+
+const TMS_TRIP_STORAGE_KEY = "TMS_TRIP_v1";
+
+const TMS_TRIP_DEFAULTS = {
+  deadheadMiles: 0,
+  loadedMiles: 0,
+  returnMiles: 0
+};
+
+// Safety caps (prevents wild typos)
+const TMS_TRIP_LIMITS = {
+  min: 0,
+  max: 5000
+};
+
+function clampNumber(v, min, max){
+  const num = Number(v);
+  if (!isFinite(num)) return min;
+  return Math.max(min, Math.min(max, num));
+}
+
+function getTripInputs(){
+  return {
+    deadheadEl: document.getElementById("deadheadMiles"),
+    loadedEl: document.getElementById("loadedMiles"),
+    returnEl: document.getElementById("returnMiles"),
+    totalEl: document.getElementById("totalMiles"),
+    msgEl: document.getElementById("tripSavedMsg")
+  };
+}
+
+function readTripFromUI(){
+  const { deadheadEl, loadedEl, returnEl } = getTripInputs();
+  if (!deadheadEl || !loadedEl || !returnEl) return { ...TMS_TRIP_DEFAULTS };
+
+  return {
+    deadheadMiles: clampNumber(deadheadEl.value, TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max),
+    loadedMiles: clampNumber(loadedEl.value,   TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max),
+    returnMiles: clampNumber(returnEl.value,   TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max)
+  };
+}
+
+function writeTripToUI(t){
+  const { deadheadEl, loadedEl, returnEl } = getTripInputs();
+  if (!deadheadEl || !loadedEl || !returnEl) return;
+
+  deadheadEl.value = t.deadheadMiles;
+  loadedEl.value   = t.loadedMiles;
+  returnEl.value   = t.returnMiles;
+
+  // Recalculate Total Miles using your existing function
+  if (typeof updateTotalMilesFromParts === "function"){
+    updateTotalMilesFromParts();
+  }
+}
+
+function loadTripPlainLock(){
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(TMS_TRIP_STORAGE_KEY) || "null");
+  } catch (e) {
+    saved = null;
+  }
+
+  const t = { ...TMS_TRIP_DEFAULTS, ...(saved || {}) };
+
+  // Clamp again in case storage had bad data
+  const safe = {
+    deadheadMiles: clampNumber(t.deadheadMiles, TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max),
+    loadedMiles:   clampNumber(t.loadedMiles,   TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max),
+    returnMiles:   clampNumber(t.returnMiles,   TMS_TRIP_LIMITS.min, TMS_TRIP_LIMITS.max)
+  };
+
+  writeTripToUI(safe);
+  showTripWarningsPlainLock(safe);
+}
+
+function saveTripPlainLock(){
+  const { msgEl } = getTripInputs();
+  const safe = readTripFromUI();
+
+  // Normalize UI to clamped values (so user sees the “truth”)
+  writeTripToUI(safe);
+
+  localStorage.setItem(TMS_TRIP_STORAGE_KEY, JSON.stringify(safe));
+
+  showTripWarningsPlainLock(safe);
+
+  if (msgEl){
+    msgEl.textContent = "✅ Saved Trip miles. (Data entry only — no math changed.)";
+  }
+}
+
+function resetTripPlainLock(){
+  localStorage.setItem(TMS_TRIP_STORAGE_KEY, JSON.stringify(TMS_TRIP_DEFAULTS));
+  loadTripPlainLock();
+
+  const { msgEl } = getTripInputs();
+  if (msgEl){
+    msgEl.textContent = "♻️ Reset Trip miles to defaults.";
+  }
+}
+
+// 🔒 Plain Lock Guardrail: warn if Return is unusually large
+function showTripWarningsPlainLock(t){
+  const { msgEl } = getTripInputs();
+  if (!msgEl) return;
+
+  // If return >= loaded and loaded > 0, show a confirmation-style warning
+  if (t.loadedMiles > 0 && t.returnMiles >= t.loadedMiles){
+    msgEl.textContent =
+      "⚠️ Heads up: Return Miles is >= Loaded Miles. That may be correct — just double-check.";
+  }
+}
+
+// Auto-save on typing (Trip only)
+document.addEventListener("DOMContentLoaded", () => {
+  loadTripPlainLock();
+
+  const { deadheadEl, loadedEl, returnEl } = getTripInputs();
+  [deadheadEl, loadedEl, returnEl].forEach(el => {
+    if (!el) return;
+    el.addEventListener("input", () => {
+      // Keep Total Miles live (you already do this oninput, but this is a safe fallback)
+      if (typeof updateTotalMilesFromParts === "function"){
+        updateTotalMilesFromParts();
+      }
+      // Save Trip entries without touching Scenario/Actual math
+      saveTripPlainLock();
+    });
+  });
 });
   </script>
 
