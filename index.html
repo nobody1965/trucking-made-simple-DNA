@@ -225,26 +225,59 @@
 
       <div id="scenarioPage" class="tabPage">
         <h3>Scenario</h3>
-        <div class="note">Scenario = estimate only. Never writes to totals/history.</div>
+      <div class="note">
+  Scenario = estimate only. Editable assumptions → locked truth.
+</div>
 
-<div id="scenarioOutput" class="sectionContent open">
-  <div class="note" id="scenarioMessage">
-    Scenario will auto-calculate when opened.
-  </div>
+<!-- ================= INPUTS (ONLY EDITABLE AREA) ================= -->
+<div class="sectionContent open">
+  <div class="note"><strong>Editable Inputs (Scenario Only)</strong></div>
 
   <div class="grid">
     <div>
-      <label>Scenario Net ($)</label>
-      <input id="scenNet" readonly />
+      <label>Revenue ($)</label>
+      <input id="scenRevenue" type="number" />
     </div>
 
     <div>
-      <label>Cost Per Mile ($)</label>
-      <input id="scenCPM" readonly />
+      <label>Deadhead Miles</label>
+      <input id="scenDeadhead" type="number" />
     </div>
 
     <div>
-      <label>Hours Away</label>
+      <label>Loaded Miles</label>
+      <input id="scenLoaded" type="number" />
+    </div>
+
+    <div>
+      <label>Return-to-Home Miles</label>
+      <input id="scenReturn" type="number" />
+    </div>
+  </div>
+</div>
+
+<!-- ================= READ-ONLY TRUTH ================= -->
+<div id="scenarioOutput" class="sectionContent open">
+  <div class="note"><strong>Auto-Calculated (Read-Only)</strong></div>
+
+  <div class="grid">
+    <div>
+      <label>Total Miles</label>
+      <input id="scenTotalMiles" readonly />
+    </div>
+
+    <div>
+      <label>Estimated MPG (Lifetime)</label>
+      <input id="scenMPG" readonly />
+    </div>
+
+    <div>
+      <label>Estimated Fuel Cost ($)</label>
+      <input id="scenFuelCost" readonly />
+    </div>
+
+    <div>
+      <label>Total Hours Away</label>
       <input id="scenHours" readonly />
     </div>
 
@@ -252,7 +285,14 @@
       <label>O.T.R.A.F.F ($/hr)</label>
       <input id="scenOTRAFF" readonly />
     </div>
+
+    <div>
+      <label>Scenario Net ($)</label>
+      <input id="scenNet" readonly />
+    </div>
   </div>
+
+  <div class="note" id="scenarioMessage"></div>
 </div>
 
         <button class="sectionBtn" type="button" onclick="toggleSection('scenarioReserveSection')">
@@ -388,6 +428,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // initialize miles
   updateTotalMilesFromParts();
+
+    // 🔁 AUTO-RECALCULATE SCENARIO WHEN INPUTS CHANGE
+  ["scenRevenue","scenDeadhead","scenLoaded","scenReturn"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el){
+      el.addEventListener("input", runScenario);
+    }
+  });
 });
     
     // ---------- Example Trip calc ----------
@@ -396,42 +444,59 @@ document.addEventListener("DOMContentLoaded", () => {
       setVal("totalMiles", total);
     }
 
-const SCENARIO_LOCK = {
-  avgSpeed: 65,           // mph
-  fuelCostPerMile: 0.75,  // placeholder avg
-  reserveRate: 0.18,      // 18% total reserves
+const SCENARIO_PLAIN_CODE = {
+  avgSpeed: 65,            // mph
+  fuelPrice: 3.75,         // placeholder (later auto-pull)
+  lifetimeMPG: 6.8,        // placeholder lifetime actual
   fuelStopMinutes: 15,
-  dotBreakHours: 8
+  dotBreakHours: 8,
+  reserveRate: 0.18        // total reserves
 };
 
 function runScenario(){
-  const miles = n("totalMiles");
-  const revenue = 0; // placeholder until rate input exists
+  // --- Editable inputs ---
+  const revenue   = n("scenRevenue");
+  const deadhead  = n("scenDeadhead");
+  const loaded    = n("scenLoaded");
+  const rtn       = n("scenReturn");
 
-  if (miles <= 0){
+  // --- Total miles ---
+  const totalMiles = deadhead + loaded + rtn;
+  setVal("scenTotalMiles", totalMiles);
+
+  if (totalMiles <= 0 || revenue <= 0){
     document.getElementById("scenarioMessage").textContent =
-      "Enter trip miles to view Scenario.";
+      "Enter revenue and miles to evaluate Scenario.";
     clearScenarioOutputs();
     return;
   }
 
+  // --- MPG (locked from lifetime actual) ---
+  const mpg = SCENARIO_PLAIN_CODE.lifetimeMPG;
+  setVal("scenMPG", mpg.toFixed(2));
+
+  // --- Fuel cost ---
+  const fuelCost =
+    (totalMiles / mpg) * SCENARIO_PLAIN_CODE.fuelPrice;
+  setVal("scenFuelCost", fuelCost.toFixed(2));
+
   // --- Time calculation ---
-  const driveHours = miles / SCENARIO_LOCK.avgSpeed;
-  const dotBreaks = Math.floor(driveHours / SCENARIO_LOCK.dotBreakHours) * 0.5;
-  const fuelStops = Math.max(1, Math.floor(miles / 500)) * (SCENARIO_LOCK.fuelStopMinutes / 60);
+  const driveHours = totalMiles / SCENARIO_PLAIN_CODE.avgSpeed;
+  const dotBreaks =
+    Math.floor(driveHours / SCENARIO_PLAIN_CODE.dotBreakHours) * 0.5;
+  const fuelStops =
+    Math.max(1, Math.floor(totalMiles / 500)) *
+    (SCENARIO_PLAIN_CODE.fuelStopMinutes / 60);
+
   const totalHours = driveHours + dotBreaks + fuelStops;
-
-  // --- Cost calculation ---
-  const tripCost = miles * SCENARIO_LOCK.fuelCostPerMile;
-  const reserves = tripCost * SCENARIO_LOCK.reserveRate;
-  const net = revenue - tripCost - reserves;
-  const cpm = (tripCost + reserves) / miles;
-  const otraff = totalHours > 0 ? net / totalHours : 0;
-
-  // --- Render ---
-  setVal("scenNet", net.toFixed(2));
-  setVal("scenCPM", cpm.toFixed(2));
   setVal("scenHours", totalHours.toFixed(2));
+
+  // --- Net + OTRAF ---
+  const reserves = revenue * SCENARIO_PLAIN_CODE.reserveRate;
+  const net = revenue - fuelCost - reserves;
+  const otraff = net / totalHours;
+
+  setVal("scenNet", net.toFixed(2));
   setVal("scenOTRAFF", otraff.toFixed(2));
 
   document.getElementById("scenarioMessage").textContent =
@@ -439,8 +504,16 @@ function runScenario(){
 }
 
 function clearScenarioOutputs(){
-  ["scenNet","scenCPM","scenHours","scenOTRAFF"].forEach(id => setVal(id,""));
+  [
+    "scenTotalMiles",
+    "scenMPG",
+    "scenFuelCost",
+    "scenHours",
+    "scenOTRAFF",
+    "scenNet"
+  ].forEach(id => setVal(id, ""));
 }
+
   </script>
 
 </body>
