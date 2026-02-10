@@ -416,43 +416,129 @@
         </div>
       </div>
 
-      <div id="actualPage" class="tabPage">
-        <h3>Actual</h3>
-        <div class="note">Actual = truth. Only Actual updates totals/history.</div>
+<div id="actualPage" class="tabPage">
+  <h3>Actual</h3>
+  <div class="note">
+    🔒 Actual = truth. <strong>Only Actual</strong> updates history/totals and Lifetime MPG.<br>
+    🔒 Inputs unlock only when <strong>Status = Delivered</strong>.
+  </div>
 
-        <button class="sectionBtn" type="button" onclick="toggleSection('actualReserveSection')">
-          ✅ Actual Reserves (tap to open / close)
-        </button>
-        <div id="actualReserveSection" class="sectionContent">
-          <div class="note">Actual reserve deductions come from what really happened.</div>
-        </div>
+  <div class="divider"></div>
+
+  <!-- STATUS GATE (LOCK) -->
+  <div class="sectionContent open">
+    <div class="note"><strong>Status (LOCK GATE)</strong></div>
+
+    <div class="grid">
+      <div>
+        <label>Status</label>
+        <input id="actStatus" type="text" readonly />
+        <div class="note">Locked until you tap “Mark Delivered”.</div>
       </div>
 
-      <div id="businessPage" class="tabPage">
-        <h3>Business</h3>
-        <div class="note">Truck & trailer payments • Insurance • Permits • Maintenance • Downtime</div>
+      <div>
+        <label>Delivered Timestamp</label>
+        <input id="actDeliveredAt" type="text" readonly />
+        <div class="note">Saved automatically when delivered.</div>
+      </div>
+    </div>
 
-        <button class="sectionBtn" type="button" onclick="toggleSection('businessReserveSection')">
-          💼 Business Reserve (tap to open / close)
-        </button>
-        <div id="businessReserveSection" class="sectionContent">
-          <div class="note">
-            Business reserve section (Business page). This one is for business budgeting logic & education.
-          </div>
-        </div>
+    <button class="sectionBtn" type="button" onclick="markDeliveredPlainLock()">
+      ✅ Mark Delivered (Unlock Actual)
+    </button>
+
+    <div id="actualGateMsg" class="note" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ACTUAL INPUTS (LOCKED UNTIL DELIVERED) -->
+  <div class="sectionContent open">
+    <div class="note"><strong>Actual Inputs (Truth)</strong></div>
+
+    <div class="grid">
+      <div>
+        <label>Revenue ($)</label>
+        <input id="actRevenue" type="number" />
       </div>
 
-      <div id="reservesPage" class="tabPage">
-        <h3>Reserves</h3>
-        <div class="note">Money set aside before take-home — on purpose.</div>
-
-        <button class="sectionBtn" type="button" onclick="toggleSection('reservesScenarioSection')">
-          🧰 Scenario Reserves (tap to open / close)
-        </button>
-        <div id="reservesScenarioSection" class="sectionContent">
-          <div class="note">Scenario reserve display and explanations.</div>
-        </div>
+      <div>
+        <label>Deadhead Miles</label>
+        <input id="actDeadhead" type="number" />
       </div>
+
+      <div>
+        <label>Loaded Miles</label>
+        <input id="actLoaded" type="number" />
+      </div>
+
+      <div>
+        <label>Return-to-Home Miles</label>
+        <input id="actReturn" type="number" />
+      </div>
+
+      <div>
+        <label>Total Miles (auto)</label>
+        <input id="actTotalMiles" type="number" readonly />
+        <div class="note">Deadhead + Loaded + Return</div>
+      </div>
+
+      <div>
+        <label>Total Gallons Purchased</label>
+        <input id="actGallons" type="number" />
+        <div class="note">Used to update Lifetime MPG.</div>
+      </div>
+
+      <div>
+        <label>Avg Fuel Price ($/gal)</label>
+        <input id="actFuelPrice" type="number" />
+      </div>
+
+      <div>
+        <label>Detention (hours)</label>
+        <input id="actDetentionHours" type="number" />
+      </div>
+    </div>
+
+    <button class="sectionBtn" type="button" onclick="saveActualPlainLock()">
+      💾 Save Actual (Truth Only)
+    </button>
+
+    <button class="sectionBtn" type="button" onclick="resetActualPlainLock()">
+      ♻️ Reset Actual
+    </button>
+
+    <div id="actualSavedMsg" class="note" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- READ-ONLY OUTPUTS (AUTO) -->
+  <div class="sectionContent open">
+    <div class="note"><strong>Actual Outputs (Read-Only)</strong></div>
+
+    <div class="grid">
+      <div>
+        <label>Fuel Cost ($)</label>
+        <input id="actFuelCost" readonly />
+      </div>
+
+      <div>
+        <label>Lifetime MPG (Updated from Actual)</label>
+        <input id="actLifetimeMPG" readonly />
+      </div>
+    </div>
+
+    <div class="note" id="actualMessage"></div>
+  </div>
+
+  <button class="sectionBtn" type="button" onclick="toggleSection('actualReserveSection')">
+    ✅ Actual Reserves (tap to open / close)
+  </button>
+  <div id="actualReserveSection" class="sectionContent">
+    <div class="note">Actual reserve deductions come from what really happened.</div>
+  </div>
+</div>
 
       <div id="totalsPage" class="tabPage">
         <h3>Totals</h3>
@@ -845,6 +931,334 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       // Save Trip entries without touching Scenario/Actual math
       saveTripPlainLock();
+    });
+  });
+});
+    
+// =====================
+// 🔒 PLAIN LOCK ACTUAL v1.0 (TRUTH ONLY)
+// =====================
+// RULES (LOCKED):
+// 1) Actual does not unlock until Status = Delivered.
+// 2) Actual writes to Actual storage + Lifetime MPG only.
+// 3) Scenario never writes into Actual.
+// 4) Actual may update lifetime MPG used by Scenario (read-only there).
+
+const TMS_ACTUAL_STORAGE_KEY = "TMS_ACTUAL_v1";
+const TMS_ACTUAL_HISTORY_KEY = "TMS_ACTUAL_HISTORY_v1";      // optional: store trips list
+const TMS_LIFETIME_MPG_KEY   = "TMS_LIFETIME_MPG_v1";
+
+const TMS_ACTUAL_DEFAULTS = {
+  status: "Locked (Not Delivered)",
+  deliveredAt: "",
+  revenue: 0,
+  deadhead: 0,
+  loaded: 0,
+  rtn: 0,
+  gallons: 0,
+  fuelPrice: 0,
+  detentionHours: 0
+};
+
+// caps prevent wild typos (same spirit as Trip caps)
+const TMS_ACTUAL_LIMITS = {
+  milesMin: 0,
+  milesMax: 8000,
+  moneyMin: 0,
+  moneyMax: 100000,
+  gallonsMin: 0,
+  gallonsMax: 3000,
+  fuelPriceMin: 0,
+  fuelPriceMax: 10,
+  hoursMin: 0,
+  hoursMax: 72
+};
+
+function clamp(v, min, max){
+  const n = Number(v);
+  if (!isFinite(n)) return min;
+  return Math.max(min, Math.min(max, n));
+}
+
+function getActualEls(){
+  return {
+    statusEl: document.getElementById("actStatus"),
+    deliveredAtEl: document.getElementById("actDeliveredAt"),
+    revenueEl: document.getElementById("actRevenue"),
+    deadheadEl: document.getElementById("actDeadhead"),
+    loadedEl: document.getElementById("actLoaded"),
+    returnEl: document.getElementById("actReturn"),
+    totalMilesEl: document.getElementById("actTotalMiles"),
+    gallonsEl: document.getElementById("actGallons"),
+    fuelPriceEl: document.getElementById("actFuelPrice"),
+    detentionEl: document.getElementById("actDetentionHours"),
+    fuelCostEl: document.getElementById("actFuelCost"),
+    lifetimeMPGEl: document.getElementById("actLifetimeMPG"),
+    gateMsgEl: document.getElementById("actualGateMsg"),
+    savedMsgEl: document.getElementById("actualSavedMsg"),
+    msgEl: document.getElementById("actualMessage")
+  };
+}
+
+function isDelivered(a){
+  return a.status === "Delivered";
+}
+
+function setActualInputsEnabled(enabled){
+  const {
+    revenueEl, deadheadEl, loadedEl, returnEl,
+    gallonsEl, fuelPriceEl, detentionEl
+  } = getActualEls();
+
+  [revenueEl, deadheadEl, loadedEl, returnEl, gallonsEl, fuelPriceEl, detentionEl]
+    .forEach(el => { if (el) el.disabled = !enabled; });
+}
+
+function readActualFromUI(){
+  const {
+    statusEl, deliveredAtEl, revenueEl, deadheadEl, loadedEl, returnEl,
+    gallonsEl, fuelPriceEl, detentionEl
+  } = getActualEls();
+
+  const status = statusEl?.value || TMS_ACTUAL_DEFAULTS.status;
+  const deliveredAt = deliveredAtEl?.value || "";
+
+  return {
+    status,
+    deliveredAt,
+    revenue: clamp(revenueEl?.value, TMS_ACTUAL_LIMITS.moneyMin, TMS_ACTUAL_LIMITS.moneyMax),
+    deadhead: clamp(deadheadEl?.value, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    loaded: clamp(loadedEl?.value, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    rtn: clamp(returnEl?.value, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    gallons: clamp(gallonsEl?.value, TMS_ACTUAL_LIMITS.gallonsMin, TMS_ACTUAL_LIMITS.gallonsMax),
+    fuelPrice: clamp(fuelPriceEl?.value, TMS_ACTUAL_LIMITS.fuelPriceMin, TMS_ACTUAL_LIMITS.fuelPriceMax),
+    detentionHours: clamp(detentionEl?.value, TMS_ACTUAL_LIMITS.hoursMin, TMS_ACTUAL_LIMITS.hoursMax)
+  };
+}
+
+function writeActualToUI(a){
+  const {
+    statusEl, deliveredAtEl, revenueEl, deadheadEl, loadedEl, returnEl,
+    totalMilesEl, gallonsEl, fuelPriceEl, detentionEl
+  } = getActualEls();
+
+  if (statusEl) statusEl.value = a.status || TMS_ACTUAL_DEFAULTS.status;
+  if (deliveredAtEl) deliveredAtEl.value = a.deliveredAt || "";
+
+  if (revenueEl) revenueEl.value = a.revenue ?? 0;
+  if (deadheadEl) deadheadEl.value = a.deadhead ?? 0;
+  if (loadedEl) loadedEl.value = a.loaded ?? 0;
+  if (returnEl) returnEl.value = a.rtn ?? 0;
+
+  const totalMiles = (a.deadhead ?? 0) + (a.loaded ?? 0) + (a.rtn ?? 0);
+  if (totalMilesEl) totalMilesEl.value = totalMiles;
+
+  if (gallonsEl) gallonsEl.value = a.gallons ?? 0;
+  if (fuelPriceEl) fuelPriceEl.value = a.fuelPrice ?? 0;
+  if (detentionEl) detentionEl.value = a.detentionHours ?? 0;
+}
+
+function calcActualOutputs(a){
+  const { fuelCostEl, lifetimeMPGEl, msgEl } = getActualEls();
+
+  const totalMiles = a.deadhead + a.loaded + a.rtn;
+  const fuelCost = (a.gallons > 0 && a.fuelPrice > 0) ? (a.gallons * a.fuelPrice) : 0;
+  if (fuelCostEl) fuelCostEl.value = fuelCost ? fuelCost.toFixed(2) : "";
+
+  const lifetimeMPG = getLifetimeMPGPlainLock();
+  if (lifetimeMPGEl) lifetimeMPGEl.value = isFinite(lifetimeMPG) && lifetimeMPG > 0 ? lifetimeMPG.toFixed(2) : "";
+
+  if (msgEl){
+    if (!isDelivered(a)){
+      msgEl.textContent = "🔒 Locked: Mark Delivered to unlock Actual entry.";
+    } else if (totalMiles <= 0){
+      msgEl.textContent = "Enter Actual miles to update truth.";
+    } else {
+      msgEl.textContent = "✅ Actual saved = truth. (Scenario remains separate.)";
+    }
+  }
+}
+
+function loadActualPlainLock(){
+  const { gateMsgEl, savedMsgEl } = getActualEls();
+
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(TMS_ACTUAL_STORAGE_KEY) || "null");
+  } catch (e) {
+    saved = null;
+  }
+
+  const a = { ...TMS_ACTUAL_DEFAULTS, ...(saved || {}) };
+
+  // clamp safe
+  const safe = {
+    status: a.status || TMS_ACTUAL_DEFAULTS.status,
+    deliveredAt: a.deliveredAt || "",
+    revenue: clamp(a.revenue, TMS_ACTUAL_LIMITS.moneyMin, TMS_ACTUAL_LIMITS.moneyMax),
+    deadhead: clamp(a.deadhead, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    loaded: clamp(a.loaded, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    rtn: clamp(a.rtn, TMS_ACTUAL_LIMITS.milesMin, TMS_ACTUAL_LIMITS.milesMax),
+    gallons: clamp(a.gallons, TMS_ACTUAL_LIMITS.gallonsMin, TMS_ACTUAL_LIMITS.gallonsMax),
+    fuelPrice: clamp(a.fuelPrice, TMS_ACTUAL_LIMITS.fuelPriceMin, TMS_ACTUAL_LIMITS.fuelPriceMax),
+    detentionHours: clamp(a.detentionHours, TMS_ACTUAL_LIMITS.hoursMin, TMS_ACTUAL_LIMITS.hoursMax)
+  };
+
+  writeActualToUI(safe);
+
+  // lock gate
+  setActualInputsEnabled(isDelivered(safe));
+  if (gateMsgEl){
+    gateMsgEl.textContent = isDelivered(safe)
+      ? "✅ Unlocked: Delivered confirmed."
+      : "🔒 Locked until Delivered.";
+  }
+  if (savedMsgEl) savedMsgEl.textContent = "";
+
+  calcActualOutputs(safe);
+}
+
+function saveActualPlainLock(){
+  const { savedMsgEl, gateMsgEl } = getActualEls();
+  const a = readActualFromUI();
+
+  // HARD FENCE: must be delivered
+  if (!isDelivered(a)){
+    if (savedMsgEl) savedMsgEl.textContent = "🔒 Cannot save Actual: Status is not Delivered.";
+    if (gateMsgEl) gateMsgEl.textContent = "Tap ✅ Mark Delivered to unlock Actual.";
+    setActualInputsEnabled(false);
+    return;
+  }
+
+  // normalize + write UI truth
+  writeActualToUI(a);
+
+  // update Lifetime MPG (from this saved trip, plus optional history)
+  commitActualToHistoryAndLifetimeMPG(a);
+
+  localStorage.setItem(TMS_ACTUAL_STORAGE_KEY, JSON.stringify(a));
+
+  if (savedMsgEl){
+    savedMsgEl.textContent = "✅ Saved Actual (Truth only). Lifetime MPG updated.";
+  }
+
+  calcActualOutputs(a);
+}
+
+function resetActualPlainLock(){
+  localStorage.setItem(TMS_ACTUAL_STORAGE_KEY, JSON.stringify(TMS_ACTUAL_DEFAULTS));
+  loadActualPlainLock();
+  const { savedMsgEl } = getActualEls();
+  if (savedMsgEl) savedMsgEl.textContent = "♻️ Reset Actual (still locked until Delivered).";
+}
+
+function markDeliveredPlainLock(){
+  const { statusEl, deliveredAtEl, gateMsgEl, savedMsgEl } = getActualEls();
+  if (!statusEl || !deliveredAtEl) return;
+
+  statusEl.value = "Delivered";
+  deliveredAtEl.value = new Date().toLocaleString();
+
+  setActualInputsEnabled(true);
+
+  if (gateMsgEl) gateMsgEl.textContent = "✅ Delivered confirmed. Actual unlocked.";
+  if (savedMsgEl) savedMsgEl.textContent = "Now enter Actual truth and tap Save.";
+
+  // persist the gate immediately (so reload stays unlocked)
+  const a = readActualFromUI();
+  a.status = "Delivered";
+  a.deliveredAt = deliveredAtEl.value;
+  localStorage.setItem(TMS_ACTUAL_STORAGE_KEY, JSON.stringify(a));
+
+  calcActualOutputs(a);
+}
+
+// ----- Lifetime MPG (LOCKED FEED FOR SCENARIO) -----
+function getLifetimeMPGPlainLock(){
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(TMS_LIFETIME_MPG_KEY) || "null");
+  } catch (e) {
+    saved = null;
+  }
+  const mpg = Number(saved?.mpg);
+  return isFinite(mpg) ? mpg : 0;
+}
+
+// Stores history as [{ totalMiles, gallons, deliveredAt }]
+function commitActualToHistoryAndLifetimeMPG(a){
+  const totalMiles = a.deadhead + a.loaded + a.rtn;
+  const gallons = a.gallons;
+
+  if (!(totalMiles > 0 && gallons > 0)) return;
+
+  let hist = [];
+  try {
+    hist = JSON.parse(localStorage.getItem(TMS_ACTUAL_HISTORY_KEY) || "[]");
+    if (!Array.isArray(hist)) hist = [];
+  } catch (e) {
+    hist = [];
+  }
+
+  // add one record (simple v1.0)
+  hist.push({
+    totalMiles,
+    gallons,
+    deliveredAt: a.deliveredAt || new Date().toISOString()
+  });
+
+  // keep history from exploding (cap to last 200)
+  if (hist.length > 200) hist = hist.slice(hist.length - 200);
+
+  localStorage.setItem(TMS_ACTUAL_HISTORY_KEY, JSON.stringify(hist));
+
+  // compute lifetime mpg
+  let milesSum = 0;
+  let gallonsSum = 0;
+  hist.forEach(r => {
+    milesSum += Number(r.totalMiles) || 0;
+    gallonsSum += Number(r.gallons) || 0;
+  });
+
+  const mpg = gallonsSum > 0 ? (milesSum / gallonsSum) : 0;
+
+  localStorage.setItem(TMS_LIFETIME_MPG_KEY, JSON.stringify({
+    mpg,
+    milesSum,
+    gallonsSum,
+    updatedAt: new Date().toISOString()
+  }));
+
+  // OPTIONAL: also update your Scenario placeholder object safely
+  // so Scenario can read Lifetime MPG as a locked value later.
+  if (typeof SCENARIO_PLAIN_CODE === "object" && SCENARIO_PLAIN_CODE){
+    // Scenario must treat this as read-only; it’s a feed from Actual truth.
+    SCENARIO_PLAIN_CODE.lifetimeMPG = mpg || SCENARIO_PLAIN_CODE.lifetimeMPG;
+  }
+}
+
+// Live total miles update on Actual typing (even before save)
+function updateActualTotalMilesUI(){
+  const { deadheadEl, loadedEl, returnEl, totalMilesEl } = getActualEls();
+  if (!deadheadEl || !loadedEl || !returnEl || !totalMilesEl) return;
+
+  const total = (Number(deadheadEl.value)||0) + (Number(loadedEl.value)||0) + (Number(returnEl.value)||0);
+  totalMilesEl.value = total;
+}
+
+// Init
+document.addEventListener("DOMContentLoaded", () => {
+  loadActualPlainLock();
+
+  const { deadheadEl, loadedEl, returnEl, revenueEl, gallonsEl, fuelPriceEl, detentionEl } = getActualEls();
+  [deadheadEl, loadedEl, returnEl, revenueEl, gallonsEl, fuelPriceEl, detentionEl].forEach(el => {
+    if (!el) return;
+    el.addEventListener("input", () => {
+      updateActualTotalMilesUI();
+      // outputs can refresh live without saving
+      const a = readActualFromUI();
+      writeActualToUI(a);
+      calcActualOutputs(a);
     });
   });
 });
